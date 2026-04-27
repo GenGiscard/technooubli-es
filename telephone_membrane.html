@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Téléphone à membrane — Musée des Technologies Oubliées</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#faf4e8;--cream:#f4ecd8;--paper:#ebdfc1;--kraft:#d4b78c;--line:rgba(74,58,38,.18);--ink:#2a2218;--ink-soft:#4a3a26;--rope:#a87d4a;--rope-dark:#7a5530;--sage:#7a8a6a;--sage-dark:#4f5e42;--sage-light:#a8b598;--rust:#b85a3a;--shadow:0 4px 18px rgba(74,58,38,.15);--shadow-lg:0 12px 40px rgba(74,58,38,.22);}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;background-image:radial-gradient(circle at 10% 10%, rgba(168,125,74,.07) 0, transparent 40%),radial-gradient(circle at 90% 80%, rgba(122,138,106,.07) 0, transparent 35%);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;z-index:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.4 0 0 0 0 0.25 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+.sidebar{position:fixed;top:0;left:0;width:280px;height:100vh;background:linear-gradient(180deg, var(--ivory) 0%, var(--paper) 100%);border-right:1px solid var(--line);padding:32px 26px 24px;display:flex;flex-direction:column;z-index:10;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--rope);border-radius:3px}
+.brand{display:flex;flex-direction:column;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.brand .musee{font-family:'DM Serif Display',serif;font-style:italic;font-size:13px;color:var(--rope-dark);letter-spacing:.08em;text-transform:uppercase}
+.brand .titre{font-family:'DM Serif Display',serif;font-weight:400;font-size:24px;line-height:1.1;color:var(--ink);margin-top:6px;letter-spacing:-.01em}
+.brand .sous{font-size:11px;color:var(--rope-dark);margin-top:8px}
+.nav{flex:1}
+.nav-section{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rope-dark);margin:18px 0 8px;font-weight:600}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;color:var(--ink-soft);text-decoration:none;font-size:14px;font-weight:500;border-radius:6px;border-left:2px solid transparent;transition:all .25s;margin-bottom:2px}
+.nav a .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--rust);font-weight:600}
+.nav a:hover{background:rgba(168,125,74,.1);color:var(--ink)}
+.nav a.active{background:rgba(184,90,58,.13);color:var(--ink);border-left-color:var(--rust);font-weight:600}
+.kbd-hint{font-size:10px;color:var(--rope-dark);text-align:center;padding-top:14px;border-top:1px solid var(--line)}
+.kbd{display:inline-block;font-family:'JetBrains Mono',monospace;background:var(--ivory);border:1px solid var(--line);padding:1px 6px;border-radius:3px;font-size:10px;color:var(--rope-dark)}
+.content{margin-left:280px;padding:0 60px 80px;max-width:1100px;position:relative;z-index:1}
+section{padding:80px 0 40px;scroll-margin-top:20px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--rust);margin-bottom:14px}
+h1{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(48px,7vw,86px);line-height:.95;color:var(--ink);letter-spacing:-.02em;margin-bottom:16px}
+h1 em{font-style:italic;color:var(--rust)}
+h2{font-family:'DM Serif Display',serif;font-weight:400;font-size:42px;color:var(--ink);margin-bottom:18px;letter-spacing:-.01em}
+h2 .num{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:18px;color:var(--rust);margin-right:14px;font-style:normal}
+h3{font-family:'DM Serif Display',serif;font-weight:400;font-size:22px;color:var(--ink);margin-bottom:10px}
+p{margin-bottom:14px;font-size:16px}
+p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
+.intro-meta{display:flex;flex-wrap:wrap;gap:24px;margin-top:30px;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.intro-meta div{display:flex;flex-direction:column;gap:2px}
+.intro-meta .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--rope-dark)}
+.intro-meta .val{font-weight:600;color:var(--ink);font-size:15px}
+.card{background:var(--ivory);border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:var(--shadow);margin-top:18px}
+.card.warm{background:linear-gradient(135deg, var(--ivory) 0%, var(--paper) 100%)}
+.anatomie-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:30px;align-items:start}
+.pieces{display:flex;flex-direction:column;gap:12px}
+.piece{background:var(--ivory);border:1px solid var(--line);border-left:3px solid var(--rust);padding:14px 18px;border-radius:6px;transition:all .2s}
+.piece:hover{background:var(--paper);transform:translateX(3px)}
+.piece .nom{font-family:'DM Serif Display',serif;font-weight:400;font-size:17px;color:var(--rope-dark)}
+.piece .desc{font-size:13px;color:var(--ink-soft);margin-top:3px}
+.anim-wrap{background:var(--ivory);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-lg);margin-top:24px}
+.anim-canvas{display:block;width:100%;background:linear-gradient(180deg, #faf4e8 0%, #e0d0a0 100%)}
+.anim-controls{display:flex;border-top:1px solid var(--line);background:var(--paper)}
+.phase-btn{flex:1;padding:18px 14px;background:transparent;border:none;border-right:1px solid var(--line);cursor:pointer;font-family:inherit;font-size:14px;font-weight:500;color:var(--ink-soft);transition:all .25s;text-align:left;position:relative}
+.phase-btn:last-child{border-right:none}
+.phase-btn:hover{background:rgba(184,90,58,.06)}
+.phase-btn.active{background:var(--ivory);color:var(--rust);font-weight:600}
+.phase-btn.active::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--rust)}
+.phase-btn .pn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--rust);display:block;margin-bottom:2px}
+.legende{background:var(--ink);color:var(--ivory);padding:22px 28px;font-size:16px;font-weight:500;line-height:1.5;min-height:80px;display:flex;align-items:center}
+.legende::before{content:"💡";margin-right:14px;font-size:22px}
+.chaine{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px}
+.chaine-bloc{background:var(--ivory);border:2px solid var(--rust);border-radius:12px;padding:22px;text-align:center;position:relative}
+.chaine-bloc::after{content:"→";position:absolute;right:-22px;top:50%;transform:translateY(-50%);font-size:28px;color:var(--rust);font-weight:700}
+.chaine-bloc:last-child::after{display:none}
+.chaine-bloc .role{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--rust);font-weight:600}
+.chaine-bloc .nom{font-family:'DM Serif Display',serif;font-size:22px;color:var(--ink);margin:8px 0 4px}
+.chaine-bloc .ex{font-size:13px;color:var(--ink-soft);font-style:italic}
+.frise{margin-top:24px;position:relative;padding:30px 0}
+.frise::before{content:"";position:absolute;top:50%;left:0;right:0;height:2px;background:linear-gradient(90deg, var(--rust) 0%, var(--sage) 100%)}
+.frise-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;position:relative;z-index:1}
+.frise-item{background:var(--ivory);border:2px solid var(--rust);border-radius:10px;padding:14px 10px;text-align:center;box-shadow:var(--shadow)}
+.frise-item .annee{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--rust);font-weight:600}
+.frise-item .obj{font-family:'DM Serif Display',serif;font-size:15px;color:var(--ink);margin:4px 0}
+.frise-item .cap{font-size:11px;color:var(--ink-soft)}
+
+/* GROS JEU LABO */
+.lab-wrap{background:linear-gradient(135deg, #4f5e42 0%, #3a4530 100%);border-radius:16px;padding:30px;color:var(--ivory);box-shadow:var(--shadow-lg);margin-top:20px;position:relative;overflow:hidden}
+.lab-wrap::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg, var(--rope) 0%, var(--rust) 50%, var(--sage-light) 100%)}
+.lab-wrap h3{color:var(--sage-light);font-family:'DM Serif Display',serif}
+.lab-wrap .lead{color:rgba(250,244,232,.85)}
+.lab-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin-top:24px}
+.lab-pad{background:rgba(250,244,232,.05);border:1px solid rgba(250,244,232,.12);border-radius:12px;padding:18px}
+.lab-pad h4{font-family:'DM Serif Display',serif;font-size:17px;color:var(--sage-light);margin-bottom:10px}
+.lab-canvas{display:block;width:100%;background:#1a1a14;border-radius:8px;margin-top:8px}
+.ctrl-pad{display:flex;flex-direction:column;gap:14px}
+.choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
+.choice-btn{background:transparent;border:1px solid rgba(250,244,232,.25);color:var(--ivory);padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:all .2s;text-align:center}
+.choice-btn:hover{background:rgba(168,184,152,.08);border-color:var(--sage-light)}
+.choice-btn.active{background:rgba(168,184,152,.18);border-color:var(--sage-light);color:var(--sage-light);font-weight:600}
+.choice-btn .ico{font-size:18px;display:block;margin-bottom:2px}
+.choice-section{display:flex;flex-direction:column;gap:6px}
+.choice-section .label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;color:rgba(250,244,232,.6);text-transform:uppercase}
+.slider-row label{display:flex;justify-content:space-between;font-size:13px;color:rgba(250,244,232,.85);margin-bottom:6px}
+.slider-row input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;background:rgba(250,244,232,.15);border-radius:3px;outline:none}
+.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--sage-light);cursor:pointer;border:2px solid var(--ivory)}
+.slider-row input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--sage-light);cursor:pointer;border:2px solid var(--ivory)}
+.slider-val{font-family:'JetBrains Mono',monospace;color:var(--sage-light);font-weight:600}
+.btn{background:var(--rust);color:var(--ivory);border:none;padding:11px 18px;border-radius:7px;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s;flex:1;min-width:120px}
+.btn:hover{background:#9a4a30;transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn.ghost{background:transparent;border:1px solid rgba(250,244,232,.3);color:var(--ivory)}
+.btn.ghost:hover{background:rgba(250,244,232,.08)}
+.btn.sage{background:var(--sage-light);color:var(--ink)}
+.btn.sage:hover{background:#94a384}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.score-row{background:rgba(250,244,232,.08);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px}
+.score-row .lbl{color:rgba(250,244,232,.6);letter-spacing:.1em}
+.score-row .val{color:var(--sage-light);font-weight:700;font-size:18px}
+.quality-display{background:#1a1a14;border-radius:8px;padding:14px;text-align:center}
+.quality-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(250,244,232,.5);letter-spacing:.15em;margin-bottom:6px}
+.quality-stars{font-size:24px;letter-spacing:4px;color:#3a4530}
+.quality-stars .on{color:var(--sage-light);text-shadow:0 0 8px rgba(168,184,152,.5)}
+.quality-msg{font-style:italic;font-size:13px;color:var(--sage-light);margin-top:4px}
+.toast{position:fixed;top:24px;right:24px;background:var(--ink);color:var(--ivory);padding:14px 22px;border-radius:8px;box-shadow:var(--shadow-lg);font-weight:500;z-index:100;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.quiz-q{background:var(--ivory);border:1px solid var(--line);border-radius:12px;padding:24px 28px;margin-bottom:14px;box-shadow:var(--shadow)}
+.quiz-q .qnum{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
+.quiz-q .qtxt{font-family:'DM Serif Display',serif;font-size:19px;color:var(--ink);margin-bottom:14px}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 16px;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink-soft);transition:all .2s;text-align:left;font-family:inherit}
+.quiz-opt:hover{background:rgba(184,90,58,.08);border-color:var(--rust)}
+.quiz-opt.right{background:#dff0d8;border-color:#7a8450;color:#4a5a25;font-weight:600}
+.quiz-opt.wrong{background:#fce4e0;border-color:var(--rust);color:#7a3025}
+.quiz-opt:disabled{cursor:default}
+.quiz-explain{margin-top:12px;padding:10px 14px;font-size:13px;color:var(--ink-soft);background:var(--paper);border-radius:6px;border-left:3px solid var(--rust);display:none}
+.quiz-explain.show{display:block}
+.quiz-score{margin-top:20px;padding:24px 28px;background:linear-gradient(135deg, var(--sage-dark) 0%, var(--ink) 100%);color:var(--ivory);border-radius:12px;text-align:center;display:none}
+.quiz-score.show{display:block}
+.quiz-score .scoreval{font-family:'DM Serif Display',serif;font-size:48px;display:block;margin:6px 0;color:var(--sage-light)}
+.quiz-score .scoremsg{font-style:italic;font-size:15px}
+.footer{margin-top:80px;padding-top:30px;border-top:1px solid var(--line);font-size:12px;color:var(--rope-dark);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer .credit{font-style:italic}
+@media (max-width:980px){.sidebar{position:relative;width:100%;height:auto}.content{margin-left:0;padding:0 24px 60px}.anatomie-grid,.lab-grid{grid-template-columns:1fr}.chaine{grid-template-columns:1fr;gap:30px}.chaine-bloc::after{right:50%;top:auto;bottom:-26px;transform:translateX(50%) rotate(90deg)}.frise-grid{grid-template-columns:repeat(2,1fr)}h1{font-size:48px}h2{font-size:30px}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <span class="musee">Musée des Technologies Oubliées</span>
+    <span class="titre">Le Téléphone<br>à membrane</span>
+    <span class="sous">Fiche n°5 · Communication · Cycle 4</span>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Cours</div>
+    <a href="#intro"><span class="num">01</span> Introduction</a>
+    <a href="#anatomie"><span class="num">02</span> Anatomie</a>
+    <a href="#fonctionnement"><span class="num">03</span> Fonctionnement</a>
+    <a href="#chaine"><span class="num">04</span> Chaîne d&rsquo;information</a>
+    <a href="#evolution"><span class="num">05</span> De la ficelle à la 5G</a>
+    <div class="nav-section">Défis</div>
+    <a href="#labo"><span class="num">06</span> Labo acoustique</a>
+    <a href="#quiz"><span class="num">07</span> Quiz final</a>
+  </nav>
+  <div class="kbd-hint">Navigation : <span class="kbd">↑</span> <span class="kbd">↓</span></div>
+</aside>
+
+<main class="content">
+  <section id="intro">
+    <div class="eyebrow">Fiche n°5 · Communication</div>
+    <h1>Le téléphone <em>à membrane</em></h1>
+    <p class="lead">Deux gobelets, une ficelle bien tendue : voilà le téléphone le plus simple du monde, parfois appelé « téléphone à ficelle ». Pas de batterie, pas d&rsquo;antenne, pas d&rsquo;onde. Juste de la <strong>vibration mécanique</strong> qui voyage dans une corde. C&rsquo;est l&rsquo;exemple parfait d&rsquo;une chaîne d&rsquo;information sans aucune électronique.</p>
+    <div class="intro-meta">
+      <div><span class="lbl">Inventé en</span><span class="val">1667 (Robert Hooke)</span></div>
+      <div><span class="lbl">Énergie</span><span class="val">Aucune (mécanique)</span></div>
+      <div><span class="lbl">Portée</span><span class="val">~30 m</span></div>
+      <div><span class="lbl">Information</span><span class="val">Voix → vibration</span></div>
+    </div>
+  </section>
+
+  <section id="anatomie">
+    <div class="eyebrow">Section 02</div>
+    <h2><span class="num">02 /</span>Anatomie d&rsquo;un téléphone à ficelle</h2>
+    <p class="lead">Trois éléments seulement. Tout est mécanique. Tout est gratuit.</p>
+    <div class="anatomie-grid card warm">
+      <div class="pieces">
+        <div class="piece"><div class="nom">① La membrane émettrice</div><div class="desc">Le fond du gobelet de l&rsquo;émetteur. Quand tu parles dedans, ta voix la fait vibrer comme un tambour.</div></div>
+        <div class="piece"><div class="nom">② La ficelle (TENDUE)</div><div class="desc">Une corde qui relie les deux gobelets. Elle transmet la vibration sous forme d&rsquo;onde mécanique. <strong>Si elle est molle, ça ne marche pas !</strong></div></div>
+        <div class="piece"><div class="nom">③ La membrane réceptrice</div><div class="desc">Le fond de l&rsquo;autre gobelet. Elle reçoit la vibration de la ficelle et la retransforme en son audible.</div></div>
+        <div class="piece"><div class="nom">④ Les nœuds d&rsquo;attache</div><div class="desc">Petits nœuds (ou rondelles) à l&rsquo;intérieur des gobelets. Ils transmettent la vibration de la membrane à la ficelle, et inversement.</div></div>
+      </div>
+      <div>
+        <svg viewBox="0 0 360 280" style="width:100%">
+          <defs>
+            <linearGradient id="cup" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#ebdfc1"/><stop offset="100%" stop-color="#a87d4a"/></linearGradient>
+          </defs>
+          <!-- Gobelet gauche (parle) -->
+          <path d="M 30 100 L 50 180 L 110 180 L 130 100 Z" fill="url(#cup)" stroke="#7a5530" stroke-width="2"/>
+          <ellipse cx="80" cy="100" rx="50" ry="12" fill="#d4b78c" stroke="#7a5530" stroke-width="2"/>
+          <ellipse cx="80" cy="100" rx="44" ry="8" fill="#7a5530" opacity=".3"/>
+          <!-- Gobelet droite (écoute) -->
+          <path d="M 230 100 L 250 180 L 310 180 L 330 100 Z" fill="url(#cup)" stroke="#7a5530" stroke-width="2"/>
+          <ellipse cx="280" cy="100" rx="50" ry="12" fill="#d4b78c" stroke="#7a5530" stroke-width="2"/>
+          <ellipse cx="280" cy="100" rx="44" ry="8" fill="#7a5530" opacity=".3"/>
+          <!-- Membranes (fond) -->
+          <ellipse cx="80" cy="180" rx="30" ry="6" fill="#7a5530"/>
+          <ellipse cx="280" cy="180" rx="30" ry="6" fill="#7a5530"/>
+          <!-- Ficelle TENDUE -->
+          <line x1="80" y1="180" x2="280" y2="180" stroke="#a87d4a" stroke-width="2.5"/>
+          <!-- Petits nœuds -->
+          <circle cx="80" cy="180" r="3.5" fill="#4a3a26"/>
+          <circle cx="280" cy="180" r="3.5" fill="#4a3a26"/>
+          <!-- Bonhomme gauche (parle) -->
+          <circle cx="20" cy="60" r="10" fill="#c9a578"/>
+          <path d="M 14 65 L 18 75 L 22 65" stroke="#2a2218" stroke-width="1" fill="none"/>
+          <text x="40" y="55" font-family="DM Serif Display" font-size="16" fill="#b85a3a" font-style="italic">"Bonjour !"</text>
+          <!-- Ondes voix -->
+          <path d="M 30 60 Q 35 55 40 60 Q 35 65 30 60" fill="#b85a3a" opacity=".5"/>
+          <!-- Bonhomme droite (écoute) -->
+          <circle cx="340" cy="60" r="10" fill="#c9a578"/>
+          <ellipse cx="328" cy="60" rx="3" ry="5" fill="#7a5530"/>
+          <text x="295" y="55" font-family="DM Serif Display" font-size="16" fill="#7a8a6a" font-style="italic">écoute</text>
+          <!-- Légendes -->
+          <g font-family="Manrope" font-size="10" fill="#7a5530" font-weight="600">
+            <text x="50" y="200">① membrane</text>
+            <text x="240" y="200">③ membrane</text>
+            <text x="160" y="195">② ficelle TENDUE</text>
+            <text x="120" y="218" font-style="italic" fill="#b85a3a">— vibration —</text>
+            <text x="55" y="240">④ nœud</text>
+            <text x="255" y="240">④ nœud</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="fonctionnement">
+    <div class="eyebrow">Section 03 · Animation pédagogique</div>
+    <h2><span class="num">03 /</span>La voix qui voyage dans la ficelle</h2>
+    <p class="lead">Quand tu parles, l&rsquo;air vibre. La membrane vibre. La ficelle vibre. La membrane d&rsquo;en face vibre. L&rsquo;air arrive à l&rsquo;oreille... 100% mécanique, 0% électronique.</p>
+    <div class="anim-wrap">
+      <canvas id="animCanvas" class="anim-canvas" width="1000" height="380"></canvas>
+      <div class="legende" id="legende">Choisis une phase ci-dessous pour démarrer l&rsquo;animation.</div>
+      <div class="anim-controls">
+        <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>Le dispositif</button>
+        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Émission</button>
+        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Transmission</button>
+        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Réception</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="chaine">
+    <div class="eyebrow">Section 04</div>
+    <h2><span class="num">04 /</span>Chaîne d&rsquo;information mécanique</h2>
+    <p class="lead">Comme tout système qui transmet une information, on retrouve les 3 fonctions habituelles. La particularité ici : tout est mécanique.</p>
+    <div class="chaine">
+      <div class="chaine-bloc"><div class="role">Acquérir</div><div class="nom">Membrane 1</div><div class="ex">capte la vibration de la voix</div></div>
+      <div class="chaine-bloc"><div class="role">Transmettre</div><div class="nom">Ficelle tendue</div><div class="ex">conduit l&rsquo;onde mécanique</div></div>
+      <div class="chaine-bloc"><div class="role">Restituer</div><div class="nom">Membrane 2</div><div class="ex">recrée le son audible</div></div>
+    </div>
+    <p style="margin-top:24px;font-style:italic;color:var(--rope-dark)">⚙ La ficelle DOIT être tendue. Si elle pendouille, l&rsquo;onde mécanique ne se propage pas correctement et le son meurt. C&rsquo;est la même physique qui fait vibrer une corde de guitare.</p>
+  </section>
+
+  <section id="evolution">
+    <div class="eyebrow">Section 05</div>
+    <h2><span class="num">05 /</span>De la ficelle à la 5G</h2>
+    <p class="lead">L&rsquo;envie de parler à quelqu&rsquo;un de loin a traversé 350 ans d&rsquo;inventions, des plus simples aux plus complexes.</p>
+    <div class="frise"><div class="frise-grid">
+      <div class="frise-item"><div class="annee">1667</div><div class="obj">Tél. à ficelle</div><div class="cap">vibration mécanique</div></div>
+      <div class="frise-item"><div class="annee">1876</div><div class="obj">Tél. Bell</div><div class="cap">électrique filaire</div></div>
+      <div class="frise-item"><div class="annee">1973</div><div class="obj">Mobile</div><div class="cap">ondes radio</div></div>
+      <div class="frise-item"><div class="annee">2007</div><div class="obj">Smartphone</div><div class="cap">internet partout</div></div>
+      <div class="frise-item"><div class="annee">2020</div><div class="obj">5G</div><div class="cap">visio mondiale</div></div>
+    </div></div>
+  </section>
+
+  <section id="labo">
+    <div class="eyebrow">Défi 06 · Laboratoire d&rsquo;acoustique</div>
+    <h2><span class="num">06 /</span>Le labo acoustique</h2>
+    <p class="lead">À toi de fabriquer le meilleur téléphone à ficelle ! Choisis le matériau de la ficelle, le type de gobelet, règle la tension, et envoie un message. Plus la qualité est haute, plus le son passe clairement.</p>
+    <div class="lab-wrap">
+      <h3>🔬 Laboratoire d&rsquo;acoustique · ESTIC</h3>
+      <div class="lab-grid">
+        <div class="lab-pad">
+          <h4>Vue de mon dispositif</h4>
+          <canvas id="labCanvas" class="lab-canvas" width="500" height="320"></canvas>
+        </div>
+        <div class="ctrl-pad">
+          <div class="lab-pad">
+            <div class="choice-section">
+              <span class="label">① Matériau de la ficelle</span>
+              <div class="choice-grid" id="choiceMat">
+                <button class="choice-btn active" data-mat="ficelle"><span class="ico">🪢</span>Ficelle</button>
+                <button class="choice-btn" data-mat="nylon"><span class="ico">🧵</span>Fil de nylon</button>
+                <button class="choice-btn" data-mat="fer"><span class="ico">⛓️</span>Fil de fer</button>
+                <button class="choice-btn" data-mat="elastique"><span class="ico">🎀</span>Élastique</button>
+              </div>
+            </div>
+          </div>
+          <div class="lab-pad">
+            <div class="choice-section">
+              <span class="label">② Type de récepteur</span>
+              <div class="choice-grid" id="choiceCup">
+                <button class="choice-btn active" data-cup="papier"><span class="ico">🥤</span>Gobelet papier</button>
+                <button class="choice-btn" data-cup="plastique"><span class="ico">🧊</span>Gobelet plastique</button>
+                <button class="choice-btn" data-cup="metal"><span class="ico">🥫</span>Boîte conserve</button>
+                <button class="choice-btn" data-cup="bois"><span class="ico">🪵</span>Pot en bois</button>
+              </div>
+            </div>
+          </div>
+          <div class="lab-pad">
+            <div class="slider-row">
+              <label>③ Tension de la ficelle <span class="slider-val" id="tensionVal">50%</span></label>
+              <input type="range" id="tensionSlider" min="0" max="100" value="50">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btnTest">📢 Envoyer "ALLÔ !"</button>
+          </div>
+          <div class="quality-display">
+            <div class="quality-label">QUALITÉ DE TRANSMISSION</div>
+            <div class="quality-stars" id="qStars">★★★★★</div>
+            <div class="quality-msg" id="qMsg">— En attente d&rsquo;un test —</div>
+          </div>
+          <div class="score-row">
+            <span class="lbl">MEILLEUR SCORE</span>
+            <span><span class="val" id="bestScore">0</span> / 100</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <div class="eyebrow">Défi 07 · Validation</div>
+    <h2><span class="num">07 /</span>Quiz final</h2>
+    <p class="lead">5 questions sur le téléphone à ficelle et la transmission mécanique du son.</p>
+    <div id="quizWrap"></div>
+    <div class="quiz-score" id="quizScore">
+      <div style="font-size:13px;letter-spacing:.15em;text-transform:uppercase;opacity:.85">Ton score</div>
+      <span class="scoreval" id="scoreVal">0/5</span>
+      <div class="scoremsg" id="scoreMsg">Bravo !</div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <div>Collège <strong>ESTIC Don Bosco</strong> · Saint-Dizier · Technologie Cycle 4</div>
+    <div class="credit">Fiche conçue par M. Agostini · Musée des Technologies Oubliées</div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const navLinks=document.querySelectorAll('.nav a');
+const sections=document.querySelectorAll('section');
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+id))}})},{rootMargin:'-30% 0px -60% 0px'});
+sections.forEach(s=>io.observe(s));
+document.addEventListener('keydown',(e)=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
+  e.preventDefault();
+  const ids=Array.from(sections).map(s=>s.id);
+  const active=document.querySelector('.nav a.active');
+  let idx=active?ids.indexOf(active.getAttribute('href').slice(1)):0;
+  idx=e.key==='ArrowDown'?Math.min(ids.length-1,idx+1):Math.max(0,idx-1);
+  document.getElementById(ids[idx]).scrollIntoView({behavior:'smooth'});
+});
+const toast=document.getElementById('toast');
+function showToast(msg,ms=2200){toast.textContent=msg;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),ms);}
+
+/* ============ ANIMATION 4 PHASES ============ */
+const canvas=document.getElementById('animCanvas');
+const ctx=canvas.getContext('2d');
+const legende=document.getElementById('legende');
+const phaseBtns=document.querySelectorAll('.phase-btn');
+const PHASES={
+  1:"PHASE 1 — Le dispositif : deux gobelets, une ficelle. Les fonds des gobelets sont les MEMBRANES. La ficelle est attachée à chaque membrane par un nœud.",
+  2:"PHASE 2 — Émission : quand on parle dans le gobelet, la voix fait VIBRER l\u2019air. L\u2019air pousse la membrane qui vibre comme un petit tambour.",
+  3:"PHASE 3 — Transmission : la membrane qui vibre tire sur la ficelle. Une ONDE MÉCANIQUE part le long de la corde tendue (à plusieurs mètres par seconde).",
+  4:"PHASE 4 — Réception : l\u2019onde arrive à l\u2019autre membrane qui se met à vibrer à son tour. Elle pousse l\u2019air dans le 2ᵉ gobelet : le son est restitué !"
+};
+let currentPhase=1, animTime=0;
+function setPhase(n){currentPhase=n;legende.textContent=PHASES[n];phaseBtns.forEach(b=>b.classList.toggle('active',+b.dataset.phase===n));animTime=0;}
+phaseBtns.forEach(b=>b.addEventListener('click',()=>setPhase(+b.dataset.phase)));
+
+function drawCup(cx,cy,vibration=0,side='left'){
+  // vibration : oscillation horizontale
+  const vx=Math.sin(animTime*15)*vibration*8;
+  ctx.save();
+  ctx.translate(cx+vx,cy);
+  // Corps gobelet
+  ctx.fillStyle='#d4b78c';
+  ctx.strokeStyle='#7a5530';ctx.lineWidth=2;
+  ctx.beginPath();
+  if(side==='left'){
+    ctx.moveTo(-30,-50);ctx.lineTo(-25,30);ctx.lineTo(25,30);ctx.lineTo(30,-50);
+  }else{
+    ctx.moveTo(-30,-50);ctx.lineTo(-25,30);ctx.lineTo(25,30);ctx.lineTo(30,-50);
+  }
+  ctx.closePath();ctx.fill();ctx.stroke();
+  // Bord supérieur
+  ctx.fillStyle='#ebdfc1';
+  ctx.beginPath();ctx.ellipse(0,-50,30,8,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#7a5530';ctx.stroke();
+  // Intérieur sombre
+  ctx.fillStyle='rgba(58,42,30,.5)';
+  ctx.beginPath();ctx.ellipse(0,-50,25,5,0,0,Math.PI*2);ctx.fill();
+  // Membrane (fond)
+  ctx.fillStyle='#7a5530';
+  ctx.beginPath();ctx.ellipse(0,30,25,4,0,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+  return cx+vx;
+}
+
+function drawAnim(){
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#faf4e8');g.addColorStop(1,'#e0d0a0');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // Sol
+  ctx.fillStyle='rgba(168,125,74,.1)';
+  ctx.fillRect(0,300,W,80);
+
+  if(currentPhase===1)drawP1();
+  else if(currentPhase===2)drawP2();
+  else if(currentPhase===3)drawP3();
+  else drawP4();
+
+  animTime+=0.03;
+  requestAnimationFrame(drawAnim);
+}
+
+function drawP1(){
+  drawCup(220,250,0,'left');
+  drawCup(780,250,0,'right');
+  // Ficelle bien tendue
+  ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(220,280);ctx.lineTo(780,280);ctx.stroke();
+  // Nœuds
+  ctx.fillStyle='#4a3a26';
+  ctx.beginPath();ctx.arc(220,280,4,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(780,280,4,0,Math.PI*2);ctx.fill();
+  // Étiquettes
+  ctx.fillStyle='#4a3a26';ctx.font='600 13px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('① Émetteur',220,200);
+  ctx.fillText('③ Récepteur',780,200);
+  ctx.fillText('② Ficelle TENDUE',500,295);
+  ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';ctx.textAlign='left';
+  ctx.fillText("Le dispositif au repos : tout est en attente.",60,80);
+  ctx.fillText("Pas de batterie, pas de fil électrique. Juste de la ficelle.",60,105);
+}
+
+function drawP2(){
+  // Gobelet gauche vibre
+  drawCup(220,250,1,'left');
+  drawCup(780,250,0,'right');
+  // Ficelle au repos pour cette phase
+  ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(220,280);ctx.lineTo(780,280);ctx.stroke();
+  ctx.fillStyle='#4a3a26';
+  ctx.beginPath();ctx.arc(220,280,4,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(780,280,4,0,Math.PI*2);ctx.fill();
+  // Bonhomme qui parle
+  ctx.fillStyle='#c9a578';
+  ctx.beginPath();ctx.arc(140,170,18,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#2a2218';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(140,170,18,0,Math.PI*2);ctx.stroke();
+  // Ondes voix qui sortent vers le gobelet
+  for(let i=0;i<4;i++){
+    const t=(animTime*0.8+i*0.5)%2;
+    const x=160+t*40;
+    const alpha=Math.max(0,1-t/2);
+    ctx.strokeStyle=`rgba(184,90,58,${alpha})`;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(x,180,8,-Math.PI/3,Math.PI/3);
+    ctx.stroke();
+  }
+  // "Allô !"
+  ctx.fillStyle='#b85a3a';ctx.font='italic 18px DM Serif Display';ctx.textAlign='left';
+  ctx.fillText('"Allô !"',95,150);
+  // Étiquettes
+  ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';
+  ctx.fillText("La voix arrive sur la membrane → elle vibre.",60,80);
+  ctx.fillText("Comme un tambour : l'air pousse, le tissu bouge.",60,105);
+  ctx.fillStyle='#b85a3a';ctx.font='600 13px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🎤 air vibrant',220,330);
+}
+
+function drawP3(){
+  drawCup(220,250,1,'left');
+  drawCup(780,250,0,'right');
+  // Ficelle qui vibre : onde sinusoïdale qui se propage
+  ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let x=220;x<=780;x++){
+    // Onde qui voyage de gauche à droite
+    const phase=(x-220)/40-animTime*4;
+    const t=(animTime*1.5)%2; // Front d'onde qui avance
+    const frontX=220+t*280;
+    let amp=0;
+    if(x<frontX){
+      amp=Math.sin(phase)*8*Math.max(0,1-(frontX-x)/300);
+    }
+    if(x===220)ctx.moveTo(x,280+amp);
+    else ctx.lineTo(x,280+amp);
+  }
+  ctx.stroke();
+  // Nœuds
+  ctx.fillStyle='#4a3a26';
+  ctx.beginPath();ctx.arc(220,280,4,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(780,280,4,0,Math.PI*2);ctx.fill();
+  // Flèche direction
+  const t=(animTime*1.5)%2;
+  const arrowX=220+t*280;
+  if(arrowX<780){
+    ctx.fillStyle='#b85a3a';ctx.font='bold 22px serif';ctx.textAlign='center';
+    ctx.fillText('→',arrowX,260);
+  }
+  // Étiquettes
+  ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';ctx.textAlign='left';
+  ctx.fillText("La membrane vibre → la ficelle vibre.",60,80);
+  ctx.fillText("L'onde mécanique voyage le long de la corde tendue.",60,105);
+  ctx.fillStyle='#b85a3a';ctx.font='600 13px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('💨 onde mécanique',500,335);
+}
+
+function drawP4(){
+  drawCup(220,250,0,'left');
+  drawCup(780,250,1,'right');
+  // Ficelle vibrante stable
+  ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let x=220;x<=780;x++){
+    const phase=(x-220)/40-animTime*4;
+    const amp=Math.sin(phase)*5;
+    if(x===220)ctx.moveTo(x,280+amp);
+    else ctx.lineTo(x,280+amp);
+  }
+  ctx.stroke();
+  ctx.fillStyle='#4a3a26';
+  ctx.beginPath();ctx.arc(220,280,4,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(780,280,4,0,Math.PI*2);ctx.fill();
+  // Bonhomme qui écoute (oreille collée au gobelet)
+  ctx.fillStyle='#c9a578';
+  ctx.beginPath();ctx.arc(880,170,18,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#2a2218';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(880,170,18,0,Math.PI*2);ctx.stroke();
+  // Ondes son qui sortent du gobelet vers l'oreille
+  for(let i=0;i<4;i++){
+    const t=(animTime*0.8+i*0.5)%2;
+    const x=820+t*40;
+    const alpha=Math.max(0,1-t/2);
+    ctx.strokeStyle=`rgba(122,138,106,${alpha})`;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(x,180,8,Math.PI*2/3,Math.PI*4/3);
+    ctx.stroke();
+  }
+  // "Allô" à droite
+  ctx.fillStyle='#7a8a6a';ctx.font='italic 18px DM Serif Display';ctx.textAlign='left';
+  ctx.fillText('"Allô !"',830,150);
+  // Étiquettes
+  ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';
+  ctx.fillText("La 2ᵉ membrane vibre à son tour → elle pousse l'air.",60,80);
+  ctx.fillText("L'oreille reçoit le son. Le message est passé !",60,105);
+}
+
+drawAnim();
+
+/* ============ LABO ACOUSTIQUE ============ */
+const MAT={
+  ficelle:{label:'Ficelle',score:75,note:'Bonne transmission, classique'},
+  nylon:{label:'Fil nylon',score:90,note:'Excellent : rigide et élastique'},
+  fer:{label:'Fil de fer',score:55,note:'Trop rigide, étouffe le son'},
+  elastique:{label:'Élastique',score:25,note:'Trop mou, absorbe les vibrations'}
+};
+const CUP={
+  papier:{label:'Gobelet papier',score:70,note:'Membrane fine, vibre bien'},
+  plastique:{label:'Gobelet plastique',score:60,note:'Correct mais membrane raide'},
+  metal:{label:'Boîte conserve',score:90,note:'Excellente caisse de résonance'},
+  bois:{label:'Pot en bois',score:50,note:'Trop épais, peu vibrant'}
+};
+
+let curMat='ficelle', curCup='papier';
+const labCanvas=document.getElementById('labCanvas');
+const lctx=labCanvas.getContext('2d');
+const tensionSlider=document.getElementById('tensionSlider');
+const tensionVal=document.getElementById('tensionVal');
+const qStars=document.getElementById('qStars');
+const qMsg=document.getElementById('qMsg');
+const bestScore=document.getElementById('bestScore');
+let best=0;
+let isTesting=false;
+let labTime=0;
+let waveAmp=0;
+
+function drawLab(){
+  const W=labCanvas.width,H=labCanvas.height;
+  lctx.clearRect(0,0,W,H);
+  // Fond labo (table)
+  const bg=lctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#1a1a14');bg.addColorStop(1,'#2a2a20');
+  lctx.fillStyle=bg;lctx.fillRect(0,0,W,H);
+  // Grille labo
+  lctx.strokeStyle='rgba(168,184,152,.08)';lctx.lineWidth=1;
+  for(let x=0;x<W;x+=20){lctx.beginPath();lctx.moveTo(x,0);lctx.lineTo(x,H);lctx.stroke();}
+  for(let y=0;y<H;y+=20){lctx.beginPath();lctx.moveTo(0,y);lctx.lineTo(W,y);lctx.stroke();}
+
+  // Tension : 0-100. À 0 ficelle pendouille, à 100 droite
+  const tension=+tensionSlider.value/100;
+
+  // Couleur ficelle selon matériau
+  const matColors={ficelle:'#a87d4a',nylon:'#e0d8c0',fer:'#7c8a9a',elastique:'#b85a3a'};
+  const matLineWidths={ficelle:2,nylon:1.5,fer:1.8,elastique:3};
+
+  // Position des gobelets
+  const cy=180;
+  const cupSize=40;
+
+  // Dessin gobelets selon type
+  function drawLabCup(cx,cy,type,vibration=0){
+    const vx=Math.sin(labTime*15)*vibration*4;
+    lctx.save();
+    lctx.translate(cx+vx,cy);
+    let fillC, strokeC;
+    if(type==='papier'){fillC='#ebdfc1';strokeC='#a87d4a';}
+    else if(type==='plastique'){fillC='#d8e8f0';strokeC='#7c8a9a';}
+    else if(type==='metal'){fillC='#b8c0c8';strokeC='#5a6068';}
+    else{fillC='#a87d4a';strokeC='#5a3018';}
+    lctx.fillStyle=fillC;
+    lctx.strokeStyle=strokeC;lctx.lineWidth=2;
+    lctx.beginPath();
+    lctx.moveTo(-cupSize,-cupSize);
+    lctx.lineTo(-cupSize*0.85,cupSize*0.6);
+    lctx.lineTo(cupSize*0.85,cupSize*0.6);
+    lctx.lineTo(cupSize,-cupSize);
+    lctx.closePath();
+    lctx.fill();lctx.stroke();
+    // Top
+    lctx.fillStyle=fillC;
+    lctx.beginPath();lctx.ellipse(0,-cupSize,cupSize,8,0,0,Math.PI*2);lctx.fill();
+    lctx.stroke();
+    lctx.fillStyle='rgba(0,0,0,.4)';
+    lctx.beginPath();lctx.ellipse(0,-cupSize,cupSize*0.85,5,0,0,Math.PI*2);lctx.fill();
+    // Membrane (fond)
+    lctx.fillStyle=strokeC;
+    lctx.beginPath();lctx.ellipse(0,cupSize*0.6,cupSize*0.85,3.5,0,0,Math.PI*2);lctx.fill();
+    lctx.restore();
+  }
+
+  drawLabCup(100,cy,curCup,isTesting?1:0);
+  drawLabCup(400,cy,curCup,isTesting?(waveAmp):0);
+
+  // Dessin ficelle
+  lctx.strokeStyle=matColors[curMat];lctx.lineWidth=matLineWidths[curMat];
+  if(curMat==='elastique'){lctx.setLineDash([5,3]);}else{lctx.setLineDash([]);}
+  lctx.beginPath();
+  for(let x=100;x<=400;x++){
+    const sag=(1-tension)*60; // sag max si tension=0
+    const norm=(x-100)/300;
+    let y=cy+cupSize*0.6 + 4*Math.sin(norm*Math.PI)*0+sag*4*norm*(1-norm); // parabole
+    // Si test en cours et tendu, ajouter onde
+    if(isTesting&&tension>0.3){
+      const phase=(x-100)/30-labTime*5;
+      y+=Math.sin(phase)*waveAmp*8;
+    }
+    if(x===100)lctx.moveTo(x,y);else lctx.lineTo(x,y);
+  }
+  lctx.stroke();
+  lctx.setLineDash([]);
+
+  // Étiquettes
+  lctx.fillStyle='rgba(168,184,152,.7)';
+  lctx.font='600 10px JetBrains Mono';lctx.textAlign='center';
+  lctx.fillText('ÉMETTEUR',100,40);
+  lctx.fillText('RÉCEPTEUR',400,40);
+  lctx.fillText(MAT[curMat].label.toUpperCase(),250,30);
+
+  // Indicateur tension
+  lctx.fillStyle=tension<0.3?'#b85a3a':(tension>0.7?'#a8b598':'#d4b78c');
+  lctx.font='600 11px JetBrains Mono';
+  lctx.fillText(tension<0.3?'⚠ TROP MOU':(tension>0.7?'✓ BIEN TENDU':'~ moyen'),250,290);
+
+  if(isTesting){
+    waveAmp=Math.max(0,waveAmp-0.015);
+    if(waveAmp<=0)isTesting=false;
+  }
+  labTime+=0.03;
+  requestAnimationFrame(drawLab);
+}
+drawLab();
+
+document.querySelectorAll('#choiceMat .choice-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#choiceMat .choice-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    curMat=b.dataset.mat;
+  });
+});
+document.querySelectorAll('#choiceCup .choice-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#choiceCup .choice-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    curCup=b.dataset.cup;
+  });
+});
+tensionSlider.addEventListener('input',()=>{
+  tensionVal.textContent=tensionSlider.value+'%';
+});
+
+document.getElementById('btnTest').addEventListener('click',()=>{
+  // Score combiné
+  const tension=+tensionSlider.value/100;
+  // Tension : si <0.3, score s'effondre. Si entre 0.7 et 0.9, optimal. Si =1, légèrement moins (ficelle qui casse).
+  let tensionScore;
+  if(tension<0.3)tensionScore=tension*0.3;
+  else if(tension<0.7)tensionScore=0.3+((tension-0.3)/0.4)*0.6;
+  else if(tension<=0.9)tensionScore=0.9+((tension-0.7)/0.2)*0.1;
+  else tensionScore=0.9-((tension-0.9)/0.1)*0.2;
+  // Pondération
+  const matScore=MAT[curMat].score/100;
+  const cupScore=CUP[curCup].score/100;
+  // Score global = produit (toute faiblesse compromet la transmission)
+  const total=Math.round(matScore*cupScore*tensionScore*100);
+  const stars=Math.max(1,Math.min(5,Math.round(total/20)));
+  qStars.innerHTML='★'.repeat(stars).split('').map(s=>'<span class="on">★</span>').join('')+'☆'.repeat(5-stars);
+  // Message contextuel
+  let msg;
+  if(total>=80)msg='🏆 Transmission cristalline ! '+MAT[curMat].note+'. '+CUP[curCup].note+'.';
+  else if(total>=60)msg='👍 Bon test. '+(tension<0.5?'Tends mieux la ficelle.':MAT[curMat].note+'.');
+  else if(total>=40)msg='😕 Son brouillé. '+(tension<0.3?'La ficelle est trop molle !':MAT[curMat].note+'.');
+  else msg='💔 Échec. '+(tension<0.3?'Tends la ficelle !':(curMat==='elastique'?'L\u2019élastique absorbe tout.':MAT[curMat].note+'.'));
+  qMsg.textContent=msg+' Score : '+total+'/100';
+
+  // Lance animation onde
+  isTesting=true;
+  waveAmp=Math.max(0.2,total/100);
+  // Son synthétique selon qualité
+  const ac=new (window.AudioContext||window.webkitAudioContext)();
+  const o=ac.createOscillator();
+  const g=ac.createGain();
+  const filter=ac.createBiquadFilter();
+  filter.type='lowpass';
+  filter.frequency.value=300+total*30; // plus c'est mauvais, plus c'est sourd
+  o.frequency.value=440;
+  o.type='sawtooth';
+  o.connect(filter).connect(g).connect(ac.destination);
+  g.gain.setValueAtTime(0,ac.currentTime);
+  g.gain.linearRampToValueAtTime(Math.max(0.05,total/300),ac.currentTime+0.05);
+  g.gain.linearRampToValueAtTime(0,ac.currentTime+0.5);
+  o.start();o.stop(ac.currentTime+0.5);
+
+  if(total>best){best=total;bestScore.textContent=best;showToast('🏆 Nouveau meilleur score : '+best);}
+});
+
+/* ============ QUIZ ============ */
+const QUIZ_DATA=[
+  {q:"Quelle énergie alimente un téléphone à ficelle ?",options:["Une pile cachée","De l\u2019énergie électrique","Aucune : c\u2019est 100% mécanique","De l\u2019énergie solaire"],correct:2,explain:"Aucune source d\u2019énergie n\u2019est nécessaire ! L\u2019énergie qui transporte le son vient directement de ta voix. C\u2019est ce qui rend l\u2019objet remarquable."},
+  {q:"Pourquoi la ficelle DOIT-elle être tendue ?",options:["Pour que ce soit joli","Pour que l\u2019onde mécanique se propage","Pour économiser de la ficelle","Sans raison particulière"],correct:1,explain:"Une ficelle molle absorbe les vibrations au lieu de les transmettre. Tendue, elle se comporte comme une corde de guitare et conduit l\u2019onde mécanique de bout en bout."},
+  {q:"Quel rôle joue le fond du gobelet (la membrane) ?",options:["Décoratif","Acquérir et restituer la vibration","Amplifier l\u2019électricité","Filtrer les bruits parasites"],correct:1,explain:"La membrane est l\u2019interface entre l\u2019air (le son) et la ficelle (la vibration mécanique). Côté émetteur elle ACQUIERT le son, côté récepteur elle le RESTITUE."},
+  {q:"Quel objet moderne fonctionne sur le MÊME principe physique (vibration mécanique d\u2019une membrane) ?",options:["Le micro et le haut-parleur","La caméra","La batterie","Le Wi-Fi"],correct:0,explain:"Tous les microphones et haut-parleurs (y compris ceux de ton smartphone) fonctionnent avec une membrane qui vibre. La différence ? Le téléphone à ficelle convertit la vibration en mouvement de corde, alors que les modernes la convertissent en signal électrique."},
+  {q:"Le téléphone à ficelle a une portée d\u2019environ :",options:["1 mètre","30 mètres","1 kilomètre","100 kilomètres"],correct:1,explain:"Au-delà de ~30 mètres, la ficelle perd trop d\u2019énergie en route et le son devient inaudible. C\u2019est suffisant pour communiquer entre deux pièces ou deux fenêtres voisines."}
+];
+const quizWrap=document.getElementById('quizWrap');
+const quizScore=document.getElementById('quizScore');
+const scoreVal=document.getElementById('scoreVal');
+const scoreMsg=document.getElementById('scoreMsg');
+let answers=new Array(QUIZ_DATA.length).fill(null);
+function renderQuiz(){
+  quizWrap.innerHTML='';
+  QUIZ_DATA.forEach((q,qi)=>{
+    const card=document.createElement('div');
+    card.className='quiz-q';
+    card.innerHTML=`<div class="qnum">Question ${qi+1} / ${QUIZ_DATA.length}</div><div class="qtxt">${q.q}</div><div class="quiz-options" id="opts-${qi}"></div><div class="quiz-explain" id="ex-${qi}">${q.explain}</div>`;
+    quizWrap.appendChild(card);
+    const opts=card.querySelector('.quiz-options');
+    q.options.forEach((opt,oi)=>{
+      const btn=document.createElement('button');
+      btn.className='quiz-opt';btn.textContent=opt;
+      btn.addEventListener('click',()=>{
+        if(answers[qi]!==null)return;
+        answers[qi]=oi;
+        opts.querySelectorAll('.quiz-opt').forEach((o,i)=>{
+          o.disabled=true;
+          if(i===q.correct)o.classList.add('right');
+          else if(i===oi)o.classList.add('wrong');
+        });
+        document.getElementById('ex-'+qi).classList.add('show');
+        if(answers.every(a=>a!==null))showFinal();
+      });
+      opts.appendChild(btn);
+    });
+  });
+}
+function showFinal(){
+  const score=answers.reduce((a,v,i)=>a+(v===QUIZ_DATA[i].correct?1:0),0);
+  scoreVal.textContent=score+'/5';
+  let msg;
+  if(score===5)msg="🏆 Parfait ! Tu as compris la physique des ondes mécaniques.";
+  else if(score>=3)msg="👍 Bien joué !";
+  else msg="📖 Reprends le cours, tu vas y arriver !";
+  scoreMsg.textContent=msg;
+  quizScore.classList.add('show');
+  quizScore.scrollIntoView({behavior:'smooth',block:'center'});
+}
+renderQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Grille-pain de cheminée — Musée des Technologies Oubliées</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,800;1,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#faf3e7;--cream:#f7eddc;--paper:#f0e2c4;--line:rgba(94,52,28,.18);--ink:#2a1810;--ink-soft:#4a2e1f;--iron:#3a2a22;--iron-light:#6a4a38;--ember:#e85d2a;--ember-dark:#b8401c;--ember-light:#ff8c3f;--gold:#d4a548;--bread:#c9a578;--bread-dark:#8a5a30;--shadow:0 4px 18px rgba(94,52,28,.18);--shadow-lg:0 12px 40px rgba(94,52,28,.22);}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;background-image:radial-gradient(circle at 10% 10%, rgba(232,93,42,.06) 0, transparent 40%),radial-gradient(circle at 90% 80%, rgba(94,52,28,.06) 0, transparent 35%);background-attachment:fixed}
+.sidebar{position:fixed;top:0;left:0;width:280px;height:100vh;background:linear-gradient(180deg, var(--ivory) 0%, var(--paper) 100%);border-right:1px solid var(--line);padding:32px 26px 24px;display:flex;flex-direction:column;z-index:10;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--ember-light);border-radius:3px}
+.brand{display:flex;flex-direction:column;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.brand .musee{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:var(--ember-dark);letter-spacing:.08em;text-transform:uppercase}
+.brand .titre{font-family:'Fraunces',serif;font-weight:800;font-size:24px;line-height:1.1;color:var(--ink);margin-top:6px;letter-spacing:-.01em}
+.brand .sous{font-size:11px;color:var(--ember-dark);margin-top:8px}
+.nav{flex:1}
+.nav-section{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ember-dark);margin:18px 0 8px;font-weight:600}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;color:var(--ink-soft);text-decoration:none;font-size:14px;font-weight:500;border-radius:6px;border-left:2px solid transparent;transition:all .25s;margin-bottom:2px}
+.nav a .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ember);font-weight:600}
+.nav a:hover{background:rgba(232,93,42,.08);color:var(--ink)}
+.nav a.active{background:rgba(232,93,42,.15);color:var(--ember-dark);border-left-color:var(--ember);font-weight:600}
+.kbd-hint{font-size:10px;color:var(--ember-dark);text-align:center;padding-top:14px;border-top:1px solid var(--line)}
+.kbd{display:inline-block;font-family:'JetBrains Mono',monospace;background:var(--ivory);border:1px solid var(--line);padding:1px 6px;border-radius:3px;font-size:10px;color:var(--ember-dark)}
+.content{margin-left:280px;padding:0 60px 80px;max-width:1100px;position:relative;z-index:1}
+section{padding:80px 0 40px;scroll-margin-top:20px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--ember);margin-bottom:14px}
+h1{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(48px,7vw,86px);line-height:.95;color:var(--ink);letter-spacing:-.02em;margin-bottom:16px}
+h1 em{font-style:italic;color:var(--ember-dark);font-weight:400}
+h2{font-family:'Fraunces',serif;font-weight:700;font-size:42px;color:var(--ink);margin-bottom:18px;letter-spacing:-.01em}
+h2 .num{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:18px;color:var(--ember);margin-right:14px}
+h3{font-family:'Fraunces',serif;font-weight:600;font-size:22px;color:var(--ink);margin-bottom:10px}
+p{margin-bottom:14px;font-size:16px}
+p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
+.intro-meta{display:flex;flex-wrap:wrap;gap:24px;margin-top:30px;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.intro-meta div{display:flex;flex-direction:column;gap:2px}
+.intro-meta .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ember-dark)}
+.intro-meta .val{font-weight:600;color:var(--ink);font-size:15px}
+.card{background:var(--ivory);border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:var(--shadow);margin-top:18px}
+.card.warm{background:linear-gradient(135deg, var(--ivory) 0%, var(--paper) 100%)}
+.anatomie-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:30px;align-items:start}
+.pieces{display:flex;flex-direction:column;gap:12px}
+.piece{background:var(--ivory);border:1px solid var(--line);border-left:3px solid var(--ember);padding:14px 18px;border-radius:6px;transition:all .2s}
+.piece:hover{background:var(--paper);transform:translateX(3px)}
+.piece .nom{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ember-dark)}
+.piece .desc{font-size:13px;color:var(--ink-soft);margin-top:3px}
+.anim-wrap{background:var(--ivory);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-lg);margin-top:24px}
+.anim-canvas{display:block;width:100%;background:linear-gradient(180deg, #faf3e7 0%, #e8d5a8 100%)}
+.anim-controls{display:flex;border-top:1px solid var(--line);background:var(--paper)}
+.phase-btn{flex:1;padding:18px 14px;background:transparent;border:none;border-right:1px solid var(--line);cursor:pointer;font-family:inherit;font-size:14px;font-weight:500;color:var(--ink-soft);transition:all .25s;text-align:left;position:relative}
+.phase-btn:last-child{border-right:none}
+.phase-btn:hover{background:rgba(232,93,42,.06)}
+.phase-btn.active{background:var(--ivory);color:var(--ember-dark);font-weight:600}
+.phase-btn.active::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--ember)}
+.phase-btn .pn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ember);display:block;margin-bottom:2px}
+.legende{background:var(--ink);color:var(--ivory);padding:22px 28px;font-size:16px;font-weight:500;line-height:1.5;min-height:80px;display:flex;align-items:center}
+.legende::before{content:"💡";margin-right:14px;font-size:22px}
+.chaine{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px}
+.chaine-bloc{background:var(--ivory);border:2px solid var(--ember);border-radius:12px;padding:22px;text-align:center;position:relative}
+.chaine-bloc::after{content:"→";position:absolute;right:-22px;top:50%;transform:translateY(-50%);font-size:28px;color:var(--ember);font-weight:700}
+.chaine-bloc:last-child::after{display:none}
+.chaine-bloc .role{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ember);font-weight:600}
+.chaine-bloc .nom{font-family:'Fraunces',serif;font-weight:700;font-size:22px;color:var(--ink);margin:8px 0 4px}
+.chaine-bloc .ex{font-size:13px;color:var(--ink-soft);font-style:italic}
+.frise{margin-top:24px;position:relative;padding:30px 0}
+.frise::before{content:"";position:absolute;top:50%;left:0;right:0;height:2px;background:linear-gradient(90deg, var(--ember) 0%, var(--gold) 100%)}
+.frise-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;position:relative;z-index:1}
+.frise-item{background:var(--ivory);border:2px solid var(--ember);border-radius:10px;padding:14px 10px;text-align:center;box-shadow:var(--shadow)}
+.frise-item .annee{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ember);font-weight:600}
+.frise-item .obj{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink);margin:4px 0}
+.frise-item .cap{font-size:11px;color:var(--ink-soft)}
+
+/* GROS JEU : grilling */
+.toaster-wrap{background:linear-gradient(135deg, #2a1810 0%, #4a2e1f 50%, #2a1810 100%);border-radius:16px;padding:30px;color:var(--ivory);box-shadow:var(--shadow-lg);margin-top:20px;position:relative;overflow:hidden}
+.toaster-wrap::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg, var(--ember-dark) 0%, var(--ember) 50%, var(--gold) 100%)}
+.toaster-wrap h3{color:var(--gold);font-family:'Fraunces',serif}
+.toaster-wrap .lead{color:rgba(250,243,231,.85)}
+.toaster-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin-top:24px}
+.fire-pad,.ctrl-pad{background:rgba(250,243,231,.05);border:1px solid rgba(250,243,231,.12);border-radius:12px;padding:18px}
+.fire-pad h4,.ctrl-pad h4{font-family:'Fraunces',serif;font-size:17px;color:var(--gold);margin-bottom:10px}
+.fire-canvas{display:block;width:100%;background:#0a0408;border-radius:8px;margin-top:8px}
+.ctrl-pad{display:flex;flex-direction:column;gap:14px}
+.slider-row label{display:flex;justify-content:space-between;font-size:13px;color:rgba(250,243,231,.8);margin-bottom:6px}
+.slider-row input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;background:rgba(250,243,231,.15);border-radius:3px;outline:none}
+.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ember);cursor:pointer;border:2px solid var(--ivory)}
+.slider-row input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--ember);cursor:pointer;border:2px solid var(--ivory)}
+.slider-val{font-family:'JetBrains Mono',monospace;color:var(--gold);font-weight:600}
+.btn{background:var(--ember);color:var(--ivory);border:none;padding:11px 18px;border-radius:7px;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s;flex:1;min-width:120px}
+.btn:hover{background:var(--ember-dark);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn.ghost{background:transparent;border:1px solid rgba(250,243,231,.3);color:var(--ivory)}
+.btn.ghost:hover{background:rgba(250,243,231,.08)}
+.btn.gold{background:var(--gold);color:var(--ink)}
+.btn.gold:hover{background:#c19838}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.gauge{background:rgba(250,243,231,.08);border-radius:8px;padding:10px 14px}
+.gauge-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(250,243,231,.6);letter-spacing:.15em;margin-bottom:6px}
+.gauge-bar{height:14px;background:#0a0408;border-radius:7px;overflow:hidden;position:relative}
+.gauge-fill{height:100%;border-radius:7px;transition:width .15s linear}
+.gauge-marks{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-around;font-size:9px;color:rgba(250,243,231,.4);font-family:'JetBrains Mono',monospace;pointer-events:none}
+.score-row{background:rgba(250,243,231,.08);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px}
+.score-row .lbl{color:rgba(250,243,231,.6);letter-spacing:.1em}
+.score-row .val{color:var(--gold);font-weight:700;font-size:18px}
+.toast{position:fixed;top:24px;right:24px;background:var(--ink);color:var(--ivory);padding:14px 22px;border-radius:8px;box-shadow:var(--shadow-lg);font-weight:500;z-index:100;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.quiz-q{background:var(--ivory);border:1px solid var(--line);border-radius:12px;padding:24px 28px;margin-bottom:14px;box-shadow:var(--shadow)}
+.quiz-q .qnum{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ember);margin-bottom:8px}
+.quiz-q .qtxt{font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:var(--ink);margin-bottom:14px}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 16px;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink-soft);transition:all .2s;text-align:left;font-family:inherit}
+.quiz-opt:hover{background:rgba(232,93,42,.08);border-color:var(--ember-light)}
+.quiz-opt.right{background:#dff0d8;border-color:#7a8450;color:#4a5a25;font-weight:600}
+.quiz-opt.wrong{background:#fce4e0;border-color:var(--ember);color:var(--ember-dark)}
+.quiz-opt:disabled{cursor:default}
+.quiz-explain{margin-top:12px;padding:10px 14px;font-size:13px;color:var(--ink-soft);background:var(--paper);border-radius:6px;border-left:3px solid var(--ember);display:none}
+.quiz-explain.show{display:block}
+.quiz-score{margin-top:20px;padding:24px 28px;background:linear-gradient(135deg, var(--ember) 0%, var(--ember-dark) 100%);color:var(--ivory);border-radius:12px;text-align:center;display:none}
+.quiz-score.show{display:block}
+.quiz-score .scoreval{font-family:'Fraunces',serif;font-weight:800;font-size:48px;display:block;margin:6px 0}
+.quiz-score .scoremsg{font-style:italic;font-size:15px}
+.footer{margin-top:80px;padding-top:30px;border-top:1px solid var(--line);font-size:12px;color:var(--ember-dark);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer .credit{font-style:italic}
+@media (max-width:980px){.sidebar{position:relative;width:100%;height:auto}.content{margin-left:0;padding:0 24px 60px}.anatomie-grid,.toaster-grid{grid-template-columns:1fr}.chaine{grid-template-columns:1fr;gap:30px}.chaine-bloc::after{right:50%;top:auto;bottom:-26px;transform:translateX(50%) rotate(90deg)}.frise-grid{grid-template-columns:repeat(2,1fr)}h1{font-size:48px}h2{font-size:30px}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <span class="musee">Musée des Technologies Oubliées</span>
+    <span class="titre">Le Grille-pain<br>de cheminée</span>
+    <span class="sous">Fiche n°4 · Quotidien · Cycle 4</span>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Cours</div>
+    <a href="#intro"><span class="num">01</span> Introduction</a>
+    <a href="#anatomie"><span class="num">02</span> Anatomie</a>
+    <a href="#fonctionnement"><span class="num">03</span> Fonctionnement</a>
+    <a href="#chaine"><span class="num">04</span> Chaîne d&rsquo;énergie</a>
+    <a href="#evolution"><span class="num">05</span> Du feu à la résistance</a>
+    <div class="nav-section">Défis</div>
+    <a href="#toaster"><span class="num">06</span> Maître griller</a>
+    <a href="#quiz"><span class="num">07</span> Quiz final</a>
+  </nav>
+  <div class="kbd-hint">Navigation : <span class="kbd">↑</span> <span class="kbd">↓</span></div>
+</aside>
+
+<main class="content">
+  <section id="intro">
+    <div class="eyebrow">Fiche n°4 · Objet du quotidien</div>
+    <h1>Le grille-pain<br><em>de cheminée</em></h1>
+    <p class="lead">Avant l&rsquo;électricité, on grillait son pain dans la cheminée familiale grâce à un simple ustensile en fer : une grille fixée au bout d&rsquo;un long manche. Pas de bouton, pas de prise. Juste les braises, le pain, et la patience. Un objet rustique mais génial pour comprendre comment l&rsquo;énergie thermique se transmet.</p>
+    <div class="intro-meta">
+      <div><span class="lbl">Apparu vers</span><span class="val">XVIIe siècle</span></div>
+      <div><span class="lbl">Matière</span><span class="val">Fer forgé / fonte</span></div>
+      <div><span class="lbl">Énergie</span><span class="val">Thermique (braises)</span></div>
+      <div><span class="lbl">Source de chaleur</span><span class="val">Bois en combustion</span></div>
+    </div>
+  </section>
+
+  <section id="anatomie">
+    <div class="eyebrow">Section 02</div>
+    <h2><span class="num">02 /</span>Anatomie de l&rsquo;ustensile</h2>
+    <p class="lead">Trois pièces seulement, en fer forgé. Pas de mécanisme, pas d&rsquo;électronique. Conçu pour durer un siècle.</p>
+    <div class="anatomie-grid card warm">
+      <div class="pieces">
+        <div class="piece"><div class="nom">① La grille (ou cage)</div><div class="desc">Un treillis ou une cage en fer qui maintient la tranche de pain à plat, exposée à la chaleur sur une face.</div></div>
+        <div class="piece"><div class="nom">② Le manche long</div><div class="desc">Une tige en fer (40-60 cm) pour tenir la grille à distance des braises sans se brûler les mains.</div></div>
+        <div class="piece"><div class="nom">③ Le système d&rsquo;ouverture</div><div class="desc">Pince ou charnière permettant d&rsquo;ouvrir la grille pour insérer/retirer le pain et le retourner.</div></div>
+      </div>
+      <div>
+        <svg viewBox="0 0 320 320" style="width:100%">
+          <defs>
+            <linearGradient id="iron" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#6a4a38"/><stop offset="100%" stop-color="#3a2a22"/></linearGradient>
+            <radialGradient id="ember" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff5d0"/><stop offset="40%" stop-color="#ff8c3f"/><stop offset="100%" stop-color="#b8401c"/></radialGradient>
+          </defs>
+          <!-- Sol/braises -->
+          <ellipse cx="160" cy="280" rx="140" ry="20" fill="#1a0808"/>
+          <g>
+            <circle cx="120" cy="278" r="10" fill="url(#ember)"/>
+            <circle cx="150" cy="282" r="14" fill="url(#ember)"/>
+            <circle cx="180" cy="278" r="11" fill="url(#ember)"/>
+            <circle cx="210" cy="282" r="9" fill="url(#ember)"/>
+            <circle cx="135" cy="285" r="6" fill="#7a3025"/>
+            <circle cx="195" cy="288" r="5" fill="#7a3025"/>
+          </g>
+          <!-- Manche -->
+          <rect x="40" y="160" width="170" height="6" fill="url(#iron)" rx="3"/>
+          <rect x="40" y="160" width="20" height="6" fill="#3a2a22"/>
+          <!-- Grille (vue de profil) -->
+          <g transform="translate(210 145)">
+            <rect x="0" y="0" width="80" height="40" fill="none" stroke="#3a2a22" stroke-width="2"/>
+            <line x1="0" y1="10" x2="80" y2="10" stroke="#3a2a22" stroke-width="1"/>
+            <line x1="0" y1="20" x2="80" y2="20" stroke="#3a2a22" stroke-width="1"/>
+            <line x1="0" y1="30" x2="80" y2="30" stroke="#3a2a22" stroke-width="1"/>
+            <line x1="20" y1="0" x2="20" y2="40" stroke="#3a2a22" stroke-width="1"/>
+            <line x1="40" y1="0" x2="40" y2="40" stroke="#3a2a22" stroke-width="1"/>
+            <line x1="60" y1="0" x2="60" y2="40" stroke="#3a2a22" stroke-width="1"/>
+            <!-- Pain -->
+            <rect x="10" y="12" width="60" height="16" fill="#c9a578" rx="2"/>
+            <rect x="10" y="12" width="60" height="6" fill="#8a5a30" rx="2"/>
+          </g>
+          <!-- Charnière -->
+          <circle cx="290" cy="165" r="4" fill="#d4a548"/>
+          <!-- Légendes -->
+          <g font-family="Manrope" font-size="11" fill="#4a2e1f" font-weight="600">
+            <text x="220" y="120">① grille (cage)</text>
+            <text x="50" y="150">② manche</text>
+            <text x="295" y="180">③ charnière</text>
+            <text x="120" y="320" font-style="italic" fill="#b8401c">braises</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="fonctionnement">
+    <div class="eyebrow">Section 03 · Animation pédagogique</div>
+    <h2><span class="num">03 /</span>Comment la chaleur fait dorer le pain</h2>
+    <p class="lead">Le grillage ne dépend pas du contact direct avec le feu : la chaleur voyage par <strong>rayonnement infrarouge</strong>, comme la lumière. Voici les 4 étapes du grillage parfait.</p>
+    <div class="anim-wrap">
+      <canvas id="animCanvas" class="anim-canvas" width="1000" height="420"></canvas>
+      <div class="legende" id="legende">Choisis une phase ci-dessous pour démarrer l&rsquo;animation.</div>
+      <div class="anim-controls">
+        <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>Les braises</button>
+        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Le rayonnement</button>
+        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Transfert au pain</button>
+        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Réaction de Maillard</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="chaine">
+    <div class="eyebrow">Section 04</div>
+    <h2><span class="num">04 /</span>Chaîne d&rsquo;énergie thermique</h2>
+    <p class="lead">L&rsquo;énergie part du bois, traverse l&rsquo;air sous forme de rayons invisibles, et finit par dorer ton pain.</p>
+    <div class="chaine">
+      <div class="chaine-bloc"><div class="role">Stocker</div><div class="nom">Bois</div><div class="ex">énergie chimique (cellulose)</div></div>
+      <div class="chaine-bloc"><div class="role">Convertir</div><div class="nom">Combustion</div><div class="ex">braises rayonnantes (~800°C)</div></div>
+      <div class="chaine-bloc"><div class="role">Restituer</div><div class="nom">Pain doré</div><div class="ex">croûte caramélisée + chaleur</div></div>
+    </div>
+    <p style="margin-top:24px;font-style:italic;color:var(--ember-dark)">⚙ Trois modes de transfert thermique sont à l&rsquo;œuvre : <strong>rayonnement</strong> (le principal, comme le soleil), <strong>convection</strong> (l&rsquo;air chaud qui monte) et <strong>conduction</strong> (le métal de la grille qui chauffe le pain par contact).</p>
+  </section>
+
+  <section id="evolution">
+    <div class="eyebrow">Section 05</div>
+    <h2><span class="num">05 /</span>Du feu à la résistance électrique</h2>
+    <p class="lead">L&rsquo;objectif n&rsquo;a jamais changé : chauffer du pain. Mais la <em>source de chaleur</em>, elle, a complètement évolué.</p>
+    <div class="frise"><div class="frise-grid">
+      <div class="frise-item"><div class="annee">XVIIᵉ</div><div class="obj">Cheminée</div><div class="cap">braises de bois</div></div>
+      <div class="frise-item"><div class="annee">1893</div><div class="obj">Crook&rsquo;s 1ᵉʳ</div><div class="cap">grille-pain électrique</div></div>
+      <div class="frise-item"><div class="annee">1921</div><div class="obj">Toastmaster</div><div class="cap">éjection auto</div></div>
+      <div class="frise-item"><div class="annee">1980</div><div class="obj">Thermostat</div><div class="cap">arrêt programmé</div></div>
+      <div class="frise-item"><div class="annee">2020</div><div class="obj">Connecté</div><div class="cap">Wi-Fi, app, IA</div></div>
+    </div></div>
+  </section>
+
+  <section id="toaster">
+    <div class="eyebrow">Défi 06 · Simulateur</div>
+    <h2><span class="num">06 /</span>Maître griller de cheminée</h2>
+    <p class="lead">Tu tiens le manche au-dessus des braises. Trop près = ça brûle. Trop loin = ça reste cru. Ton défi : faire griller la tranche à la PERFECTION sur les deux faces. N&rsquo;oublie pas de retourner !</p>
+    <div class="toaster-wrap">
+      <h3>🔥 Cheminée familiale · Hiver 1750</h3>
+      <div class="toaster-grid">
+        <div class="fire-pad">
+          <h4>Vue de la cheminée</h4>
+          <canvas id="fireCanvas" class="fire-canvas" width="500" height="320"></canvas>
+        </div>
+        <div class="ctrl-pad">
+          <h4>Mes contrôles</h4>
+          <div class="slider-row">
+            <label>Distance des braises <span class="slider-val" id="distVal">15 cm</span></label>
+            <input type="range" id="distSlider" min="5" max="30" value="15">
+          </div>
+          <div class="gauge">
+            <div class="gauge-label">CUISSON FACE A</div>
+            <div class="gauge-bar"><div class="gauge-fill" id="gaugeA" style="width:0%;background:linear-gradient(90deg, #c9a578 0%, #ff8c3f 60%, #2a1810 100%)"></div>
+              <div class="gauge-marks"><span>cru</span><span>doré</span><span>brûlé</span></div>
+            </div>
+          </div>
+          <div class="gauge">
+            <div class="gauge-label">CUISSON FACE B</div>
+            <div class="gauge-bar"><div class="gauge-fill" id="gaugeB" style="width:0%;background:linear-gradient(90deg, #c9a578 0%, #ff8c3f 60%, #2a1810 100%)"></div>
+              <div class="gauge-marks"><span>cru</span><span>doré</span><span>brûlé</span></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btnStart">▶ Approcher des braises</button>
+            <button class="btn ghost" id="btnFlip">↻ Retourner</button>
+          </div>
+          <div class="btn-row">
+            <button class="btn gold" id="btnEat">🍞 Manger</button>
+            <button class="btn ghost" id="btnReset">🆕 Nouvelle tranche</button>
+          </div>
+          <div class="score-row">
+            <span class="lbl">TRANCHES PARFAITES</span>
+            <span><span class="val" id="perfectCount">0</span> / <span id="totalCount">0</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <div class="eyebrow">Défi 07 · Validation</div>
+    <h2><span class="num">07 /</span>Quiz final</h2>
+    <p class="lead">5 questions sur le grille-pain de cheminée et les transferts thermiques.</p>
+    <div id="quizWrap"></div>
+    <div class="quiz-score" id="quizScore">
+      <div style="font-size:13px;letter-spacing:.15em;text-transform:uppercase;opacity:.85">Ton score</div>
+      <span class="scoreval" id="scoreVal">0/5</span>
+      <div class="scoremsg" id="scoreMsg">Bravo !</div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <div>Collège <strong>ESTIC Don Bosco</strong> · Saint-Dizier · Technologie Cycle 4</div>
+    <div class="credit">Fiche conçue par M. Agostini · Musée des Technologies Oubliées</div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const navLinks=document.querySelectorAll('.nav a');
+const sections=document.querySelectorAll('section');
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id;navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+id))}})},{rootMargin:'-30% 0px -60% 0px'});
+sections.forEach(s=>io.observe(s));
+document.addEventListener('keydown',(e)=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
+  e.preventDefault();
+  const ids=Array.from(sections).map(s=>s.id);
+  const active=document.querySelector('.nav a.active');
+  let idx=active?ids.indexOf(active.getAttribute('href').slice(1)):0;
+  idx=e.key==='ArrowDown'?Math.min(ids.length-1,idx+1):Math.max(0,idx-1);
+  document.getElementById(ids[idx]).scrollIntoView({behavior:'smooth'});
+});
+const toast=document.getElementById('toast');
+function showToast(msg,ms=2200){toast.textContent=msg;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),ms);}
+
+/* ============ ANIMATION 4 PHASES ============ */
+const canvas=document.getElementById('animCanvas');
+const ctx=canvas.getContext('2d');
+const legende=document.getElementById('legende');
+const phaseBtns=document.querySelectorAll('.phase-btn');
+const PHASES={
+  1:"PHASE 1 — Les braises : le bois a fini de flamber. Il reste des morceaux rouges incandescents (~800°C). C\u2019est la SOURCE d\u2019énergie thermique.",
+  2:"PHASE 2 — Le rayonnement : les braises émettent de la chaleur sous forme d\u2019ONDES INFRAROUGES invisibles, comme la lumière. La chaleur voyage dans l\u2019air sans contact.",
+  3:"PHASE 3 — Le transfert : les rayons IR atteignent le pain et chauffent sa surface. Plus le pain est PROCHE, plus il chauffe vite (loi du carré inverse).",
+  4:"PHASE 4 — La réaction de Maillard : à partir de ~140°C, les sucres et protéines du pain réagissent. La croûte se forme, dore, et libère les arômes du pain grillé."
+};
+let currentPhase=1, animTime=0;
+function setPhase(n){currentPhase=n;legende.textContent=PHASES[n];phaseBtns.forEach(b=>b.classList.toggle('active',+b.dataset.phase===n));animTime=0;}
+phaseBtns.forEach(b=>b.addEventListener('click',()=>setPhase(+b.dataset.phase)));
+
+function drawEmbers(cx,cy,glow=1){
+  const embers=[
+    {x:-80,y:0,r:14},{x:-50,y:5,r:18},{x:-15,y:-2,r:16},
+    {x:20,y:4,r:20},{x:55,y:-1,r:15},{x:85,y:3,r:13}
+  ];
+  embers.forEach((e,i)=>{
+    const flicker=0.85+Math.sin(animTime*4+i*1.3)*0.15;
+    const grd=ctx.createRadialGradient(cx+e.x,cy+e.y,0,cx+e.x,cy+e.y,e.r);
+    grd.addColorStop(0,`rgba(255,245,208,${glow*flicker})`);
+    grd.addColorStop(.4,`rgba(255,140,63,${glow*flicker})`);
+    grd.addColorStop(1,`rgba(184,64,28,${glow*0.3})`);
+    ctx.fillStyle=grd;
+    ctx.beginPath();ctx.arc(cx+e.x,cy+e.y,e.r,0,Math.PI*2);ctx.fill();
+  });
+  // Sol
+  ctx.fillStyle='#1a0808';
+  ctx.beginPath();ctx.ellipse(cx,cy+15,130,10,0,0,Math.PI*2);ctx.fill();
+}
+
+function drawPainOnGrille(cx,cy,doneness=0,showGrille=true){
+  // Grille
+  if(showGrille){
+    ctx.strokeStyle='#3a2a22';ctx.lineWidth=2;
+    ctx.strokeRect(cx-50,cy-15,100,30);
+    for(let x=cx-40;x<cx+50;x+=12){
+      ctx.beginPath();ctx.moveTo(x,cy-15);ctx.lineTo(x,cy+15);ctx.stroke();
+    }
+    for(let y=cy-10;y<cy+15;y+=10){
+      ctx.beginPath();ctx.moveTo(cx-50,y);ctx.lineTo(cx+50,y);ctx.stroke();
+    }
+  }
+  // Pain (la couleur dépend de la cuisson)
+  let r,g,b;
+  if(doneness<0.5){
+    // cru -> doré
+    const t=doneness*2;
+    r=201-30*t; g=165-50*t; b=120-50*t;
+  }else if(doneness<0.85){
+    const t=(doneness-0.5)/0.35;
+    r=171-100*t; g=115-80*t; b=70-60*t;
+  }else{
+    r=42; g=24; b=10;
+  }
+  ctx.fillStyle=`rgb(${r},${g},${b})`;
+  ctx.fillRect(cx-44,cy-10,88,20);
+  // Croûte plus foncée
+  ctx.fillStyle=`rgb(${r-30},${g-25},${b-20})`;
+  ctx.fillRect(cx-44,cy-10,88,5);
+}
+
+function drawAnim(){
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#faf3e7');g.addColorStop(1,'#e8d5a8');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  // Cadre cheminée léger
+  ctx.fillStyle='rgba(58,42,34,.06)';
+  ctx.fillRect(120,40,760,360);
+  ctx.strokeStyle='rgba(58,42,34,.15)';ctx.lineWidth=2;
+  ctx.strokeRect(120,40,760,360);
+
+  if(currentPhase===1)drawP1();
+  else if(currentPhase===2)drawP2();
+  else if(currentPhase===3)drawP3();
+  else drawP4();
+
+  animTime+=0.03;
+  requestAnimationFrame(drawAnim);
+}
+
+function drawP1(){
+  // Juste les braises
+  drawEmbers(500,340,1);
+  // Bois résiduel
+  ctx.fillStyle='#3a2a22';
+  ctx.fillRect(440,335,30,8);
+  ctx.fillRect(530,338,25,6);
+  // Étiquettes
+  ctx.fillStyle='#b8401c';ctx.font='600 13px JetBrains Mono';ctx.textAlign='left';
+  ctx.fillText('🔥 Braises ~800°C',640,330);
+  ctx.fillText('Énergie thermique stockée',640,350);
+  ctx.fillStyle='#2a1810';ctx.font='italic 16px Fraunces';
+  ctx.fillText("Le bois a fini de flamber. Il reste des braises rouges.",60,80);
+  ctx.fillText("C'est la source de chaleur — pas de flamme.",60,105);
+}
+
+function drawP2(){
+  drawEmbers(500,340,1);
+  // Ondes IR sortant des braises
+  for(let i=0;i<5;i++){
+    const t=(animTime*0.6+i*0.4)%2;
+    const r=20+t*180;
+    const alpha=Math.max(0,(1-t/2)*0.5);
+    ctx.strokeStyle=`rgba(232,93,42,${alpha})`;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(500,340,r,Math.PI*1.1,Math.PI*1.9);
+    ctx.stroke();
+  }
+  // Symboles IR
+  ctx.fillStyle='#e85d2a';ctx.font='600 14px JetBrains Mono';ctx.textAlign='center';
+  for(let i=0;i<3;i++){
+    const t=(animTime*0.5+i*0.7)%2;
+    const y=340-t*100;
+    const alpha=Math.max(0,1-t/2);
+    ctx.fillStyle=`rgba(232,93,42,${alpha})`;
+    ctx.fillText('IR',460+i*30,y);
+  }
+  ctx.fillStyle='#2a1810';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
+  ctx.fillText("Les braises émettent des ondes infrarouges (invisibles).",60,80);
+  ctx.fillText("La chaleur voyage SANS CONTACT, comme la lumière du soleil.",60,105);
+  ctx.fillStyle='#b8401c';ctx.font='600 13px JetBrains Mono';
+  ctx.fillText('💡 Mode = RAYONNEMENT',680,80);
+}
+
+function drawP3(){
+  drawEmbers(500,340,1);
+  // Pain au-dessus, distance variable selon animTime
+  const dist=70+Math.sin(animTime)*5;
+  const painY=340-dist;
+  // Manche
+  ctx.strokeStyle='#3a2a22';ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(180,painY);ctx.lineTo(450,painY);ctx.stroke();
+  // Pain
+  const doneness=Math.min(0.4,animTime*0.15);
+  drawPainOnGrille(500,painY,doneness);
+  // Rayons concentrés vers le pain
+  for(let i=-2;i<=2;i++){
+    const x=480+i*15;
+    const t=(animTime*1.2+i*0.3)%1;
+    const y=340-t*dist;
+    ctx.fillStyle=`rgba(232,93,42,${(1-t)*0.6})`;
+    ctx.font='bold 14px serif';ctx.textAlign='center';
+    ctx.fillText('▲',x,y);
+  }
+  // Flèches énergie
+  ctx.strokeStyle='#e85d2a';ctx.lineWidth=2;
+  for(let i=-1;i<=1;i++){
+    const x=500+i*30;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(x,330);ctx.lineTo(x,painY+15);ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  // Étiquettes
+  ctx.fillStyle='#2a1810';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
+  ctx.fillText("Le pain reçoit l'énergie infrarouge → il chauffe.",60,80);
+  ctx.fillText("Plus c'est PRÈS, plus c'est CHAUD (×4 si distance ÷2).",60,105);
+}
+
+function drawP4(){
+  drawEmbers(500,340,0.7);
+  // Pain bien doré
+  const painY=270;
+  ctx.strokeStyle='#3a2a22';ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(180,painY);ctx.lineTo(450,painY);ctx.stroke();
+  drawPainOnGrille(500,painY,0.7);
+  // Vapeur arôme
+  ctx.strokeStyle='rgba(212,165,72,.5)';ctx.lineWidth=2;
+  for(let i=0;i<3;i++){
+    ctx.beginPath();
+    for(let t=0;t<1;t+=0.05){
+      const x=480+i*20+Math.sin(t*8+animTime*2+i)*8;
+      const y=painY-10-t*60;
+      if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  // Symbole formule chimique
+  ctx.fillStyle='#b8401c';ctx.font='600 13px JetBrains Mono';ctx.textAlign='left';
+  ctx.fillText('🧪 Réaction de Maillard',640,80);
+  ctx.fillText('sucres + protéines → croûte dorée',640,100);
+  ctx.fillText('+ arômes (mélanoïdines)',640,120);
+  ctx.fillStyle='#2a1810';ctx.font='italic 16px Fraunces';
+  ctx.fillText("À partir de 140°C, le pain dore et libère ses arômes.",60,80);
+  ctx.fillText("C'est la même réaction qu'une viande grillée !",60,105);
+}
+
+drawAnim();
+
+/* ============ JEU MAÎTRE GRILLER ============ */
+const fireCanvas=document.getElementById('fireCanvas');
+const fctx=fireCanvas.getContext('2d');
+const distSlider=document.getElementById('distSlider');
+const distVal=document.getElementById('distVal');
+const gaugeA=document.getElementById('gaugeA');
+const gaugeB=document.getElementById('gaugeB');
+const btnStart=document.getElementById('btnStart');
+const btnFlip=document.getElementById('btnFlip');
+const btnEat=document.getElementById('btnEat');
+const btnReset=document.getElementById('btnReset');
+
+let cookingA=0, cookingB=0;
+let activeFace='A'; // face A en bas (vers les braises) initialement
+let isCooking=false;
+let perfect=0, totalT=0;
+let cookInterval=null;
+
+function distance(){return +distSlider.value;}
+
+function drawFire(){
+  const W=fireCanvas.width,H=fireCanvas.height;
+  fctx.clearRect(0,0,W,H);
+  // Arrière cheminée
+  const bg=fctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#1a0808');bg.addColorStop(1,'#3a1a10');
+  fctx.fillStyle=bg;fctx.fillRect(0,0,W,H);
+  // Pierres
+  fctx.fillStyle='#2a1810';
+  fctx.fillRect(0,H-40,W,40);
+  for(let i=0;i<6;i++){
+    fctx.fillStyle='#3a2a22';
+    fctx.beginPath();
+    fctx.arc(40+i*80,H-30,18,0,Math.PI*2);fctx.fill();
+  }
+  // Braises
+  const embers=[
+    {x:120,y:H-60,r:18},{x:160,y:H-55,r:22},{x:200,y:H-58,r:20},
+    {x:250,y:H-52,r:24},{x:300,y:H-58,r:20},{x:340,y:H-55,r:22},{x:380,y:H-60,r:18}
+  ];
+  const t=performance.now()/300;
+  embers.forEach((e,i)=>{
+    const flicker=0.85+Math.sin(t+i*1.3)*0.15;
+    const grd=fctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.r);
+    grd.addColorStop(0,`rgba(255,245,208,${flicker})`);
+    grd.addColorStop(.4,`rgba(255,140,63,${flicker})`);
+    grd.addColorStop(1,'rgba(184,64,28,.3)');
+    fctx.fillStyle=grd;
+    fctx.beginPath();fctx.arc(e.x,e.y,e.r,0,Math.PI*2);fctx.fill();
+  });
+  // Petites flammes occasionnelles
+  for(let i=0;i<4;i++){
+    const x=140+i*70+Math.sin(t*2+i)*5;
+    const fy=H-55-10-Math.sin(t*3+i)*8;
+    fctx.fillStyle=`rgba(255,140,63,${0.3+Math.sin(t+i)*0.2})`;
+    fctx.beginPath();
+    fctx.moveTo(x-6,H-55);fctx.lineTo(x,fy);fctx.lineTo(x+6,H-55);
+    fctx.closePath();fctx.fill();
+  }
+
+  // Calcul position pain
+  const d=distance(); // 5 (proche) à 30 (loin)
+  // distance px = inverse de d (5cm => très bas, 30cm => très haut)
+  const breadY=H-90-(30-d)*5;
+
+  // Manche (sort par la gauche)
+  fctx.strokeStyle='#3a2a22';fctx.lineWidth=6;fctx.lineCap='round';
+  fctx.beginPath();fctx.moveTo(20,breadY);fctx.lineTo(280,breadY);fctx.stroke();
+  // Bout du manche (poignée)
+  fctx.fillStyle='#1a0808';
+  fctx.fillRect(0,breadY-6,30,12);
+  // Charnière
+  fctx.fillStyle='#d4a548';
+  fctx.beginPath();fctx.arc(280,breadY,5,0,Math.PI*2);fctx.fill();
+
+  // Grille en dessous (vue de profil)
+  const gx=290, gy=breadY-2;
+  fctx.strokeStyle='#3a2a22';fctx.lineWidth=2;
+  fctx.strokeRect(gx,gy-12,160,24);
+  for(let x=gx+15;x<gx+160;x+=15){
+    fctx.beginPath();fctx.moveTo(x,gy-12);fctx.lineTo(x,gy+12);fctx.stroke();
+  }
+
+  // Pain (la face vers les braises est plus cuite, donc face en bas)
+  // On affiche la face A en bas si activeFace==='A', sinon face B
+  const cookA=cookingA, cookB=cookingB;
+  // Déterminer couleur de chaque face
+  function colorFor(c){
+    let r,g,b;
+    if(c<0.5){const t=c*2;r=201-30*t;g=165-50*t;b=120-50*t;}
+    else if(c<0.85){const t=(c-0.5)/0.35;r=171-129*t;g=115-91*t;b=70-60*t;}
+    else{r=42;g=24;b=10;}
+    return `rgb(${r},${g},${b})`;
+  }
+  const topCook=activeFace==='A'?cookB:cookA;
+  const botCook=activeFace==='A'?cookA:cookB;
+  // Mie (intermédiaire)
+  fctx.fillStyle='#e8c898';
+  fctx.fillRect(gx+5,gy-9,150,18);
+  // Face haut
+  fctx.fillStyle=colorFor(topCook);
+  fctx.fillRect(gx+5,gy-9,150,5);
+  // Face bas
+  fctx.fillStyle=colorFor(botCook);
+  fctx.fillRect(gx+5,gy+4,150,5);
+  // Bordures
+  fctx.strokeStyle='#3a2a22';fctx.lineWidth=1;
+  fctx.strokeRect(gx+5,gy-9,150,18);
+
+  // Indication face active
+  fctx.fillStyle='rgba(212,165,72,.9)';fctx.font='600 11px JetBrains Mono';
+  fctx.fillText('Face '+activeFace+' (bas)',gx+5,gy-20);
+
+  // Indicateur distance
+  fctx.strokeStyle='rgba(212,165,72,.6)';fctx.lineWidth=1;fctx.setLineDash([3,3]);
+  fctx.beginPath();fctx.moveTo(gx+170,gy+12);fctx.lineTo(gx+170,H-55);fctx.stroke();
+  fctx.setLineDash([]);
+  fctx.fillStyle='rgba(212,165,72,.9)';fctx.font='600 11px JetBrains Mono';
+  fctx.fillText(d+' cm',gx+175,(gy+12+H-55)/2);
+
+  // Vapeur arôme si bien doré
+  if(topCook>0.5||botCook>0.5){
+    fctx.strokeStyle='rgba(212,165,72,.4)';fctx.lineWidth=1.5;
+    for(let i=0;i<3;i++){
+      fctx.beginPath();
+      for(let s=0;s<1;s+=0.1){
+        const px=gx+30+i*40+Math.sin(s*8+t+i)*4;
+        const py=gy-12-s*30;
+        if(s===0)fctx.moveTo(px,py);else fctx.lineTo(px,py);
+      }
+      fctx.stroke();
+    }
+  }
+
+  requestAnimationFrame(drawFire);
+}
+drawFire();
+
+distSlider.addEventListener('input',()=>{
+  distVal.textContent=distSlider.value+' cm';
+});
+
+function startCooking(){
+  if(isCooking)return;
+  isCooking=true;
+  btnStart.textContent='⏹ Reculer';
+  cookInterval=setInterval(()=>{
+    const d=distance();
+    // vitesse = inverse au carré de la distance (très rapide près, lent loin)
+    const speed=0.012*Math.pow(15/d,1.8);
+    if(activeFace==='A')cookingA=Math.min(1,cookingA+speed);
+    else cookingB=Math.min(1,cookingB+speed);
+    updateGauges();
+    // Auto burn warning
+    if((activeFace==='A'?cookingA:cookingB)>0.93&&!isBurnt){
+      isBurnt=true;
+      showToast('🔥 Attention, ça commence à brûler !');
+    }
+  },80);
+}
+function stopCooking(){
+  isCooking=false;
+  btnStart.textContent='▶ Approcher des braises';
+  clearInterval(cookInterval);
+}
+let isBurnt=false;
+btnStart.addEventListener('click',()=>{
+  if(isCooking)stopCooking();else startCooking();
+});
+
+btnFlip.addEventListener('click',()=>{
+  activeFace=activeFace==='A'?'B':'A';
+  isBurnt=false;
+  showToast('↻ Tu as retourné la tranche — face '+activeFace+' vers les braises');
+});
+
+function updateGauges(){
+  gaugeA.style.width=(cookingA*100)+'%';
+  gaugeB.style.width=(cookingB*100)+'%';
+}
+
+function evaluate(a,b){
+  // perfect : 0.55 - 0.8
+  const goodA=a>=0.55&&a<=0.8;
+  const goodB=b>=0.55&&b<=0.8;
+  if(goodA&&goodB)return{label:'parfait',msg:'🏆 PARFAIT ! Tranche dorée des deux côtés, bravo !'};
+  if(a>0.85||b>0.85)return{label:'brule',msg:'🔥 Trop cuit ! Une face est carbonisée.'};
+  if(a<0.4||b<0.4)return{label:'cru',msg:'🥶 Une face est encore crue ou à peine chaude.'};
+  return{label:'moyen',msg:'😕 Mangeable, mais pas la perfection. Une face mal cuite.'};
+}
+
+btnEat.addEventListener('click',()=>{
+  if(isCooking)stopCooking();
+  totalT++;
+  const r=evaluate(cookingA,cookingB);
+  if(r.label==='parfait')perfect++;
+  document.getElementById('perfectCount').textContent=perfect;
+  document.getElementById('totalCount').textContent=totalT;
+  showToast(r.msg,3000);
+});
+
+btnReset.addEventListener('click',()=>{
+  cookingA=0;cookingB=0;
+  activeFace='A';
+  isBurnt=false;
+  if(isCooking)stopCooking();
+  updateGauges();
+  showToast('🍞 Nouvelle tranche posée sur la grille');
+});
+
+/* ============ QUIZ ============ */
+const QUIZ_DATA=[
+  {q:"Comment la chaleur des braises arrive-t-elle PRINCIPALEMENT au pain ?",options:["Par contact direct (conduction)","Par rayonnement (ondes infrarouges)","Par convection (air chaud qui monte)","Par les bruits du feu"],correct:1,explain:"Le pain n\u2019est pas en contact avec les braises. C\u2019est principalement le RAYONNEMENT infrarouge (comme le Soleil te chauffe sans te toucher) qui transmet l\u2019énergie."},
+  {q:"Que devient l\u2019énergie chimique du bois pendant la combustion ?",options:["Elle disparaît","Elle se transforme en énergie thermique et lumineuse","Elle devient électrique","Elle est stockée dans la cendre"],correct:1,explain:"La combustion convertit l\u2019énergie chimique stockée dans le bois en énergie thermique (chaleur) et lumineuse (rougeoiement des braises). C\u2019est une CONVERSION d\u2019énergie."},
+  {q:"À quoi sert le manche LONG du grille-pain de cheminée ?",options:["À décorer","À tenir la grille loin des braises pour ne pas se brûler les mains","À mesurer la cuisson","À allumer le feu"],correct:1,explain:"Le manche maintient l\u2019utilisateur à distance des hautes températures. C\u2019est une fonction de PROTECTION/sécurité, prévue dès la conception."},
+  {q:"Comment s\u2019appelle la réaction qui fait DORER le pain ?",options:["La photosynthèse","La fermentation","La réaction de Maillard","La cuisson Pasteur"],correct:2,explain:"À partir de 140°C, les sucres et acides aminés de la croûte réagissent : c\u2019est la réaction de Maillard, qui dore les aliments et libère leurs arômes (pain, viande grillée, café...)."},
+  {q:"Quel est l\u2019équivalent moderne du grille-pain de cheminée ?",options:["Le micro-ondes","Le grille-pain électrique","La poêle","Le four à induction"],correct:1,explain:"Le grille-pain électrique fait exactement le même travail (rayonnement infrarouge sur du pain) mais la source de chaleur est une RÉSISTANCE qui transforme l\u2019énergie électrique en chaleur, au lieu de braises."}
+];
+const quizWrap=document.getElementById('quizWrap');
+const quizScore=document.getElementById('quizScore');
+const scoreVal=document.getElementById('scoreVal');
+const scoreMsg=document.getElementById('scoreMsg');
+let answers=new Array(QUIZ_DATA.length).fill(null);
+function renderQuiz(){
+  quizWrap.innerHTML='';
+  QUIZ_DATA.forEach((q,qi)=>{
+    const card=document.createElement('div');
+    card.className='quiz-q';
+    card.innerHTML=`<div class="qnum">Question ${qi+1} / ${QUIZ_DATA.length}</div><div class="qtxt">${q.q}</div><div class="quiz-options" id="opts-${qi}"></div><div class="quiz-explain" id="ex-${qi}">${q.explain}</div>`;
+    quizWrap.appendChild(card);
+    const opts=card.querySelector('.quiz-options');
+    q.options.forEach((opt,oi)=>{
+      const btn=document.createElement('button');
+      btn.className='quiz-opt';btn.textContent=opt;
+      btn.addEventListener('click',()=>{
+        if(answers[qi]!==null)return;
+        answers[qi]=oi;
+        opts.querySelectorAll('.quiz-opt').forEach((o,i)=>{
+          o.disabled=true;
+          if(i===q.correct)o.classList.add('right');
+          else if(i===oi)o.classList.add('wrong');
+        });
+        document.getElementById('ex-'+qi).classList.add('show');
+        if(answers.every(a=>a!==null))showFinal();
+      });
+      opts.appendChild(btn);
+    });
+  });
+}
+function showFinal(){
+  const score=answers.reduce((a,v,i)=>a+(v===QUIZ_DATA[i].correct?1:0),0);
+  scoreVal.textContent=score+'/5';
+  let msg;
+  if(score===5)msg="🏆 Parfait ! Tu pourrais tenir une cheminée du XVIIᵉ siècle.";
+  else if(score>=3)msg="👍 Bien joué !";
+  else msg="📖 Reprends le cours, tu vas y arriver !";
+  scoreMsg.textContent=msg;
+  quizScore.classList.add('show');
+  quizScore.scrollIntoView({behavior:'smooth',block:'center'});
+}
+renderQuiz();
+</script>
+</body>
+</html>
