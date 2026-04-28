@@ -920,8 +920,8 @@ p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
       <div class="anim-controls">
         <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>Structure</button>
         <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Le son gravé</button>
-        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>La lecture</button>
-        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>L&rsquo;amplification</button>
+        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Vue intérieure</button>
+        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Coupe du pavillon</button>
       </div>
     </div>
   </section>
@@ -1015,7 +1015,7 @@ p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
           <canvas id="waveCanvas" class="studio-canvas" width="500" height="120"></canvas>
           <div class="btn-row">
             <button class="btn" id="btnGraver">💎 Graver le disque</button>
-            <button class="btn ghost" id="btnEcouter">🔊 Écouter la source</button>
+            <button class="btn ghost" id="btnEcouter">📊 Visualiser l&rsquo;onde</button>
           </div>
         </div>
 
@@ -1150,10 +1150,10 @@ const PHASES = {
     txt: "PHASE 2 — Le son est GRAVÉ : zoom sur le sillon. Sa profondeur varie comme la voix. Plus la voix est forte, plus le sillon est creux.",
   },
   3: {
-    txt: "PHASE 3 — La lecture : le disque tourne, l\u2019aiguille suit le sillon et VIBRE exactement comme la voix d\u2019origine. Pas d\u2019électricité, juste de la mécanique.",
+    txt: "PHASE 3 — Vue intérieure : observe le sillon ondulé qui défile sous l\u2019aiguille (gauche). L\u2019aiguille VIBRE et transmet ses oscillations au bras puis à la membrane qui PULSE (droite).",
   },
   4: {
-    txt: "PHASE 4 — L\u2019amplification : le pavillon (cornet doré) AMPLIFIE le son par sa forme conique. Le son sort fort, audible dans toute la pièce.",
+    txt: "PHASE 4 — Coupe du pavillon : un PETIT son entre par la membrane (gauche). Les ondes voyagent et s\u2019élargissent dans le cône. Un GROS son sort à droite. Le pavillon est un mégaphone passif.",
   }
 };
 
@@ -1377,70 +1377,347 @@ function drawPhase2() {
 }
 
 function drawPhase3() {
-  // Disque qui tourne
-  const rot = animTime * 1.2;
-  // Vibration : forte quand l'aiguille suit le sillon
-  const vibrate = 1.5 + Math.sin(animTime * 6) * 0.5;
-  drawGramophone(rot, vibrate);
+  // === VUE ÉCLATÉE : on voit l'INTÉRIEUR du mécanisme ===
+  // 3 panneaux : sillon (zoom), aiguille+bras+membrane (zoom), corps gramophone (réduit)
 
-  // Onde le long du bras (vibration qui remonte)
+  // Panneau 1 : SILLON ZOOMÉ (à gauche)
+  const p1x = 40, p1y = 60, p1w = 280, p1h = 200;
+  ctx.fillStyle = '#fdf6e7';
+  ctx.fillRect(p1x, p1y, p1w, p1h);
+  ctx.strokeStyle = '#b87333';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(p1x, p1y, p1w, p1h);
+  ctx.fillStyle = '#b87333';
+  ctx.font = '600 11px JetBrains Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('① SILLON (vue agrandie)', p1x + p1w / 2, p1y - 8);
+
+  // Surface du disque (au-dessus)
+  ctx.fillStyle = 'rgba(58,40,24,.15)';
+  ctx.fillRect(p1x + 10, p1y + 10, p1w - 20, 50);
+  ctx.fillStyle = '#7a5c3a';
+  ctx.font = 'italic 11px Manrope';
+  ctx.fillText('surface du disque', p1x + p1w / 2, p1y + 35);
+
+  // Sillon ondulé qui défile
+  ctx.strokeStyle = '#3a2818';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let x = 0; x <= p1w - 20; x += 2) {
+    // Le sillon défile horizontalement
+    const phase = (x + animTime * 80) * 0.06;
+    const wave = Math.sin(phase) * 18 + Math.sin(phase * 2.3) * 6;
+    const y = p1y + 130 + wave;
+    if (x === 0) ctx.moveTo(p1x + 10 + x, y);
+    else ctx.lineTo(p1x + 10 + x, y);
+  }
+  ctx.stroke();
+  // Aiguille FIXE qui descend dans le sillon (au milieu)
+  const ax = p1x + p1w / 2;
+  const phase0 = (p1w / 2 + animTime * 80) * 0.06;
+  const ay = p1y + 130 + Math.sin(phase0) * 18 + Math.sin(phase0 * 2.3) * 6;
+  // Aiguille (corps métallique)
+  ctx.fillStyle = '#d4a548';
+  ctx.beginPath();
+  ctx.moveTo(ax - 8, p1y + 70);
+  ctx.lineTo(ax + 8, p1y + 70);
+  ctx.lineTo(ax + 2, ay - 4);
+  ctx.lineTo(ax - 2, ay - 4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#8a4f1f';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  // Pointe
+  ctx.fillStyle = '#8a4f1f';
+  ctx.beginPath();
+  ctx.arc(ax, ay, 3, 0, Math.PI * 2);
+  ctx.fill();
+  // Indicateur position verticale aiguille
+  ctx.strokeStyle = 'rgba(193,85,74,.4)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(ax, p1y + 75);
+  ctx.lineTo(ax, ay);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Flèche défilement
+  ctx.fillStyle = '#7a5c3a';
+  ctx.font = '600 11px Manrope';
+  ctx.textAlign = 'left';
+  ctx.fillText('défilement →', p1x + 12, p1y + p1h - 10);
+
+  // Panneau 2 : MÉCANISME aiguille → bras → membrane (vue de profil agrandie)
+  const p2x = 360, p2y = 60, p2w = 290, p2h = 200;
+  ctx.fillStyle = '#fdf6e7';
+  ctx.fillRect(p2x, p2y, p2w, p2h);
+  ctx.strokeStyle = '#b87333';
+  ctx.strokeRect(p2x, p2y, p2w, p2h);
+  ctx.fillStyle = '#b87333';
+  ctx.font = '600 11px JetBrains Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('② AIGUILLE → MEMBRANE', p2x + p2w / 2, p2y - 8);
+
+  // Vibration synchronisée avec ay (calculée plus haut)
+  const vibrAmp = (ay - (p1y + 130)) * 0.4; // Réutilise la position de l'aiguille
+  // Aiguille agrandie
+  const aiguilleX = p2x + 60;
+  const aiguilleBaseY = p2y + 100;
+  // Disque vu de côté
+  ctx.fillStyle = '#1a120a';
+  ctx.fillRect(p2x + 30, p2y + 130, 80, 12);
+  ctx.fillStyle = '#3a2818';
+  // Sillon ondulé
+  ctx.strokeStyle = '#5a4a35';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  for (let x = 30; x <= 110; x += 1) {
+    const px = p2x + x;
+    const py = p2y + 132 + Math.sin((x + animTime * 80) * 0.4) * 1.5;
+    if (x === 30) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // Aiguille qui se déplace verticalement (vibration)
+  ctx.strokeStyle = '#d4a548';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(aiguilleX, p2y + 50);
+  ctx.lineTo(aiguilleX, aiguilleBaseY + vibrAmp);
+  ctx.stroke();
+  // Pointe sur le disque
+  ctx.fillStyle = '#8a4f1f';
+  ctx.beginPath();
+  ctx.arc(aiguilleX, aiguilleBaseY + vibrAmp + 30, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Bras qui transmet (segment incliné)
+  ctx.strokeStyle = '#8a6c4a';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(aiguilleX, p2y + 50);
+  ctx.lineTo(p2x + 200, p2y + 70);
+  ctx.stroke();
+
+  // Membrane (cercle qui pulse en miroir de l'aiguille)
+  const memX = p2x + 230, memY = p2y + 70;
+  // Membrane support
+  ctx.fillStyle = '#d4a548';
+  ctx.beginPath();
+  ctx.arc(memX, memY, 28, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#8a4f1f';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // Membrane bombée (vibration)
+  const bulge = vibrAmp * 1.5;
+  ctx.fillStyle = '#fdf6e7';
+  ctx.beginPath();
+  ctx.ellipse(memX, memY, 22 + Math.abs(bulge) * 0.5, 22 + Math.abs(bulge) * 0.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#c1554a';
+  ctx.lineWidth = 1.5;
+  // Cercle bombé
+  ctx.beginPath();
+  ctx.arc(memX, memY, 22, 0, Math.PI * 2);
+  ctx.stroke();
+  // Indicateur de pulsation (cercles concentriques)
+  if (Math.abs(vibrAmp) > 0.5) {
+    ctx.strokeStyle = `rgba(193,85,74,${Math.abs(vibrAmp) / 10})`;
+    ctx.lineWidth = 2;
+    for (let i = 1; i <= 3; i++) {
+      ctx.beginPath();
+      ctx.arc(memX, memY, 22 + i * 5 + Math.abs(vibrAmp), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+  // Onde lumineuse qui voyage dans le bras
   const dashOffset = (animTime * 30) % 14;
   ctx.strokeStyle = '#c1554a';
-  ctx.lineWidth = 2.5;
-  ctx.setLineDash([6, 8]);
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
   ctx.lineDashOffset = -dashOffset;
   ctx.beginPath();
-  ctx.moveTo(395, 275);
-  ctx.lineTo(420, 200);
+  ctx.moveTo(aiguilleX + 5, p2y + 52);
+  ctx.lineTo(p2x + 200, p2y + 70);
   ctx.stroke();
   ctx.setLineDash([]);
 
   // Étiquettes
+  ctx.fillStyle = '#7a5c3a';
+  ctx.font = '600 10px Manrope';
+  ctx.textAlign = 'center';
+  ctx.fillText('aiguille', aiguilleX, p2y + 40);
+  ctx.fillText('bras', p2x + 150, p2y + 50);
+  ctx.fillText('membrane', memX, memY + 50);
   ctx.fillStyle = '#c1554a';
-  ctx.font = '600 13px Manrope';
-  ctx.textAlign = 'left';
-  ctx.fillText('vibrations →', 360, 230);
+  ctx.fillText('VIBRATION', p2x + 145, p2y + 90);
 
+  // Vue d'ensemble (en bas)
   ctx.fillStyle = '#2a1d10';
-  ctx.font = 'italic 16px Playfair Display';
-  ctx.fillText("L'aiguille vibre dans le sillon...", 60, 80);
-  ctx.fillText("...et transmet ces vibrations à la membrane !", 60, 105);
+  ctx.font = 'italic 15px Playfair Display';
+  ctx.textAlign = 'left';
+  ctx.fillText("→ L'aiguille suit le sillon ondulé et VIBRE.", 60, 305);
+  ctx.fillText("→ Cette vibration se transmet au BRAS, puis fait pulser la MEMBRANE.", 60, 330);
+  ctx.fillText("→ La membrane qui bouge PUSH l'air → le son reprend forme.", 60, 355);
 }
 
 function drawPhase4() {
-  drawGramophone(animTime * 1.2, 1.2);
+  // === VUE EN COUPE DU PAVILLON : on voit comment le son est amplifié ===
 
-  // Ondes sonores qui sortent du pavillon
-  const baseX = 720, baseY = 70;
-  for (let i = 0; i < 4; i++) {
-    const t = (animTime * 0.8 + i * 0.6) % 2.4;
-    const r = t * 70;
-    const alpha = Math.max(0, 1 - t / 2.4);
-    ctx.strokeStyle = `rgba(184,115,51,${alpha})`;
-    ctx.lineWidth = 3;
+  // Côté gauche : membrane source
+  const memX = 130, memY = 200;
+  // Caisson + disque (mini, à gauche)
+  ctx.fillStyle = '#7a5c3a';
+  ctx.fillRect(60, 270, 100, 50);
+  ctx.fillStyle = '#1a120a';
+  ctx.beginPath();
+  ctx.ellipse(110, 270, 40, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Membrane qui pulse
+  const pulse = Math.sin(animTime * 8) * 6;
+  ctx.fillStyle = '#d4a548';
+  ctx.beginPath();
+  ctx.arc(memX, memY, 30, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#8a4f1f';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = '#fdf6e7';
+  ctx.beginPath();
+  ctx.arc(memX, memY, 22 + pulse * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#c1554a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(memX, memY, 22, 0, Math.PI * 2);
+  ctx.stroke();
+  // Étiquette
+  ctx.fillStyle = '#7a5c3a';
+  ctx.font = '600 11px Manrope';
+  ctx.textAlign = 'center';
+  ctx.fillText('Membrane', memX, memY + 50);
+  ctx.fillText('(petit son)', memX, memY + 65);
+
+  // === PAVILLON EN COUPE (vue de profil, intérieur visible) ===
+  // Forme conique : étroit à gauche, large à droite
+  ctx.save();
+  // Pavillon - face supérieure
+  const grdT = ctx.createLinearGradient(150, 100, 850, 200);
+  grdT.addColorStop(0, '#8a4f1f');
+  grdT.addColorStop(0.5, '#b87333');
+  grdT.addColorStop(1, '#d4a548');
+  ctx.strokeStyle = grdT;
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(160, 175);
+  ctx.quadraticCurveTo(450, 110, 850, 60);
+  ctx.stroke();
+  // Pavillon - face inférieure
+  ctx.beginPath();
+  ctx.moveTo(160, 225);
+  ctx.quadraticCurveTo(450, 290, 850, 340);
+  ctx.stroke();
+  // Indications de coupe (hachures bleues sur les bords)
+  ctx.strokeStyle = '#7a5c3a';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 12; i++) {
+    const t = i / 12;
+    const x = 160 + t * 690;
+    const y1 = 175 - t * 115;
+    const y2 = 225 + t * 115;
     ctx.beginPath();
-    ctx.arc(baseX + r * 0.6, baseY, r, -Math.PI / 2.5, -Math.PI / 6);
+    ctx.moveTo(x, y1 - 8);
+    ctx.lineTo(x + 5, y1);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y2 + 8);
+    ctx.lineTo(x + 5, y2);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // === ONDES SONORES À L'INTÉRIEUR DU PAVILLON ===
+  // Elles partent étroites de la membrane et S'ÉLARGISSENT
+  for (let i = 0; i < 5; i++) {
+    const t = (animTime * 1.0 + i * 0.4) % 2;
+    if (t > 1.9) continue;
+    const progress = t / 2;
+    const x = 160 + progress * 690;
+    // Largeur de l'onde = largeur du pavillon à cette position
+    const halfHeight = 25 + progress * 115;
+    const alpha = Math.max(0, (1 - progress) * 0.7);
+    ctx.strokeStyle = `rgba(193,85,74,${alpha + 0.3})`;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x, 200 - halfHeight);
+    ctx.quadraticCurveTo(x + 15, 200, x, 200 + halfHeight);
     ctx.stroke();
   }
 
-  // Notes de musique animées
-  const notes = ['♪', '♫', '♩'];
-  for (let i = 0; i < 3; i++) {
-    const t = (animTime * 0.6 + i * 0.5) % 2;
-    const x = 760 + t * 70;
-    const y = 60 - t * 20 + Math.sin(animTime * 3 + i) * 8;
-    const alpha = Math.max(0, 1 - t / 2);
-    ctx.fillStyle = `rgba(193,85,74,${alpha})`;
-    ctx.font = 'bold 28px Georgia';
-    ctx.fillText(notes[i], x, y);
+  // Petites particules d'air (montrent le mouvement)
+  for (let i = 0; i < 25; i++) {
+    const t = (animTime * 0.5 + i * 0.13) % 2;
+    const progress = t / 2;
+    const x = 160 + progress * 690 + Math.sin(animTime * 3 + i) * 5;
+    const halfHeight = 25 + progress * 115;
+    const yBase = 200 + (Math.sin(i * 1.7) * halfHeight * 0.9);
+    const alpha = Math.max(0, 1 - progress);
+    ctx.fillStyle = `rgba(212,165,72,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(x, yBase, 2, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  // Étiquettes
+  // Notes qui sortent à droite (gros son amplifié)
+  const notes = ['♪', '♫', '♩', '♬'];
+  for (let i = 0; i < 4; i++) {
+    const t = (animTime * 0.7 + i * 0.5) % 2;
+    const x = 880 + t * 60;
+    const y = 200 + (Math.sin(animTime * 2 + i) * 60) - t * 30;
+    const alpha = Math.max(0, 1 - t / 2);
+    ctx.fillStyle = `rgba(193,85,74,${alpha})`;
+    ctx.font = `bold ${28 + i * 4}px Georgia`;
+    ctx.textAlign = 'center';
+    ctx.fillText(notes[i % 4], x, y);
+  }
+
+  // Étiquettes pédagogiques
+  ctx.fillStyle = '#b87333';
+  ctx.font = '600 13px JetBrains Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('PAVILLON (vue en coupe)', 500, 95);
+  ctx.fillText('forme conique = AMPLIFICATION', 500, 380);
+  // Flèches indicatrices
+  ctx.strokeStyle = '#c1554a';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([3, 3]);
+  // Petite onde au début
+  ctx.beginPath();
+  ctx.moveTo(180, 110);
+  ctx.lineTo(190, 175);
+  ctx.stroke();
+  // Grande onde à la fin
+  ctx.beginPath();
+  ctx.moveTo(820, 110);
+  ctx.lineTo(820, 65);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#c1554a';
+  ctx.font = '600 11px Manrope';
+  ctx.fillText('petit son', 180, 100);
+  ctx.fillText('GROS SON !', 820, 100);
+
+  // Texte explicatif principal
   ctx.fillStyle = '#2a1d10';
   ctx.font = 'italic 16px Playfair Display';
   ctx.textAlign = 'left';
-  ctx.fillText("Le pavillon AMPLIFIE le son par sa forme conique.", 60, 80);
-  ctx.fillText("100% mécanique, sans aucune électricité !", 60, 105);
+  ctx.fillText("Le pavillon est un AMPLIFICATEUR ACOUSTIQUE.", 60, 50);
+  ctx.fillText("Comme un mégaphone : le son entre étroit et sort large.", 60, 75);
 }
 
 drawAnim();
@@ -1460,12 +1737,6 @@ const btnGraver = document.getElementById('btnGraver');
 const btnEcouter = document.getElementById('btnEcouter');
 const btnLire = document.getElementById('btnLire');
 const btnReset = document.getElementById('btnReset');
-
-let audioCtx = null;
-function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return audioCtx;
-}
 
 let gravedFreq = null;
 let gravedAmp = null;
@@ -1620,18 +1891,63 @@ ampSlider.addEventListener('input', updateLabels);
 updateLabels();
 drawDisc(0, false);
 
+// État d'animation visuelle de l'onde source
+let waveAnimating = false;
+let waveAnimStart = 0;
+
 btnEcouter.addEventListener('click', () => {
-  const ctx2 = getAudioCtx();
-  const osc = ctx2.createOscillator();
-  const gain = ctx2.createGain();
-  osc.frequency.value = +freqSlider.value;
-  osc.type = 'sine';
-  gain.gain.value = (+ampSlider.value / 100) * 0.3;
-  osc.connect(gain).connect(ctx2.destination);
-  osc.start();
-  osc.stop(ctx2.currentTime + 1.0);
-  showToast('🔊 Source jouée — c\u2019est ce son qui sera gravé');
+  waveAnimating = true;
+  waveAnimStart = performance.now();
+  showToast('📊 Visualisation : onde sinusoïdale qui se propage');
+  animateWave();
 });
+
+function animateWave() {
+  const elapsed = (performance.now() - waveAnimStart) / 1000;
+  if (elapsed > 1.8) {
+    waveAnimating = false;
+    drawWave(); // remettre statique
+    return;
+  }
+  drawWaveAnimated(elapsed);
+  requestAnimationFrame(animateWave);
+}
+
+function drawWaveAnimated(t) {
+  const W = waveCanvas.width, H = waveCanvas.height;
+  wctx.clearRect(0, 0, W, H);
+  wctx.fillStyle = '#1a120a';
+  wctx.fillRect(0, 0, W, H);
+  // Grille
+  wctx.strokeStyle = 'rgba(220,168,120,.15)';
+  wctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    wctx.beginPath();
+    wctx.moveTo(0, (H / 4) * i);
+    wctx.lineTo(W, (H / 4) * i);
+    wctx.stroke();
+  }
+  // Onde qui se déplace (effet "défilement")
+  const f = +freqSlider.value;
+  const a = +ampSlider.value / 100;
+  wctx.strokeStyle = '#dca878';
+  wctx.shadowColor = '#dca878';
+  wctx.shadowBlur = 8;
+  wctx.lineWidth = 2.5;
+  wctx.beginPath();
+  for (let x = 0; x <= W; x++) {
+    const xt = x / W;
+    const y = H / 2 + Math.sin(xt * f / 30 - t * 8) * (H / 2 - 10) * a;
+    if (x === 0) wctx.moveTo(x, y);
+    else wctx.lineTo(x, y);
+  }
+  wctx.stroke();
+  wctx.shadowBlur = 0;
+  // Label avec indicateur ACTIVE
+  wctx.fillStyle = '#dca878';
+  wctx.font = '600 10px JetBrains Mono';
+  wctx.fillText('● SOURCE EN COURS', 8, 14);
+}
 
 btnGraver.addEventListener('click', () => {
   gravedFreq = +freqSlider.value;
@@ -1653,35 +1969,63 @@ btnReset.addEventListener('click', () => {
 btnLire.addEventListener('click', () => {
   if (gravedFreq === null) return;
   isPlaying = true;
-  const ctx2 = getAudioCtx();
-  const osc = ctx2.createOscillator();
-  const gain = ctx2.createGain();
-  osc.frequency.value = gravedFreq;
-  osc.type = 'sawtooth'; // plus "vintage"
-  gain.gain.value = (gravedAmp / 100) * 0.25;
-  // Filtre pour effet "vieux"
-  const filter = ctx2.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 1200;
-  osc.connect(filter).connect(gain).connect(ctx2.destination);
-  osc.start();
+  showToast('▶ Lecture du disque gravé... (regarde les ondes sortir !)');
 
-  // Animation rotation
+  // Animation rotation + ondes sonores visuelles
   let rot = 0;
   const start = performance.now();
   function spin() {
     rot += 0.05;
-    drawDisc(rot, true);
-    if (performance.now() - start < 2500) requestAnimationFrame(spin);
+    const elapsed = (performance.now() - start) / 1000;
+    drawDiscWithWaves(rot, elapsed);
+    if (elapsed < 2.5) requestAnimationFrame(spin);
     else {
       isPlaying = false;
       drawDisc(0, true);
     }
   }
   spin();
-  osc.stop(ctx2.currentTime + 2.5);
-  showToast('▶ Lecture du disque gravé...');
 });
+
+function drawDiscWithWaves(rotation, elapsed) {
+  drawDisc(rotation, true);
+  // Ajouter ondes sonores visuelles qui sortent du disque
+  const cx = discCanvas.width / 2;
+  const cy = discCanvas.height / 2;
+  const a = gravedAmp / 100;
+  const f = gravedFreq;
+  const speed = f / 220;
+  // Cercles concentriques expansifs (plus rapides si fréquence élevée)
+  for (let i = 0; i < 4; i++) {
+    const t = (elapsed * speed + i * 0.4) % 1.6;
+    const r = 110 + t * 120;
+    const alpha = Math.max(0, (1 - t / 1.6) * a);
+    dctx.strokeStyle = `rgba(220,168,120,${alpha})`;
+    dctx.lineWidth = 2 + a * 2;
+    dctx.beginPath();
+    dctx.arc(cx, cy, r, 0, Math.PI * 2);
+    dctx.stroke();
+  }
+  // Notes qui sortent du disque
+  const notes = ['♪', '♫', '♩'];
+  for (let i = 0; i < 3; i++) {
+    const t = (elapsed * 0.7 + i * 0.5) % 2;
+    const ang = i * 2.1 + elapsed * 0.5;
+    const r = 130 + t * 80;
+    const x = cx + Math.cos(ang) * r;
+    const y = cy + Math.sin(ang) * r;
+    const alpha = Math.max(0, 1 - t / 2);
+    dctx.fillStyle = `rgba(193,85,74,${alpha})`;
+    dctx.font = `bold ${20 + a * 10}px Georgia`;
+    dctx.textAlign = 'center';
+    dctx.fillText(notes[i], x, y);
+  }
+  // Indicateur "EN LECTURE"
+  dctx.fillStyle = 'rgba(220,168,120,.9)';
+  dctx.font = '600 11px JetBrains Mono';
+  dctx.textAlign = 'left';
+  dctx.fillText('● LECTURE EN COURS', 12, 18);
+}
 
 /* =============================================
    4. DÉFI CHAÎNE D'INFORMATION (gros jeu 2)

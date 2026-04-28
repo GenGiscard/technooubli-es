@@ -215,10 +215,10 @@ p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
       <canvas id="animCanvas" class="anim-canvas" width="1000" height="420"></canvas>
       <div class="legende" id="legende">Choisis une phase ci-dessous pour démarrer l&rsquo;animation.</div>
       <div class="anim-controls">
-        <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>L&rsquo;ampoule au repos</button>
-        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>L&rsquo;étincelle</button>
-        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>La combustion</button>
-        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Rotation du cube</button>
+        <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>Vue moléculaire</button>
+        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Étincelle (zoom)</button>
+        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Réaction chimique</button>
+        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Mécanisme rotation</button>
       </div>
     </div>
   </section>
@@ -336,10 +336,10 @@ const ctx=canvas.getContext('2d');
 const legende=document.getElementById('legende');
 const phaseBtns=document.querySelectorAll('.phase-btn');
 const PHASES={
-  1:"PHASE 1 — Au repos : la bulle contient un filament fin de magnésium en pelote, baignant dans de l\u2019oxygène pur. Elle attend l\u2019étincelle.",
-  2:"PHASE 2 — L\u2019étincelle : l\u2019appareil envoie une décharge électrique sur le filament. Il commence à chauffer instantanément.",
-  3:"PHASE 3 — Combustion explosive : le magnésium s\u2019enflamme et brûle dans l\u2019oxygène. Réaction Mg+O₂→MgO + lumière intense (flash blanc !).",
-  4:"PHASE 4 — Rotation : le cube tourne d\u2019un quart de tour pour présenter une face neuve. La face brûlée reste fixée, devenue inutile."
+  1:"PHASE 1 — Au repos : à l\u2019échelle atomique, on voit les atomes Mg du filament (gris, ordonnés) et les molécules O₂ qui flottent (bleu). Ils sont SÉPARÉS : aucune réaction.",
+  2:"PHASE 2 — Le déclencheur : un courant électrique part de l\u2019appareil photo vers le filament. À l\u2019échelle atomique, les atomes Mg s\u2019agitent et chauffent jusqu\u2019au seuil d\u2019inflammation.",
+  3:"PHASE 3 — Combustion : les atomes Mg et les molécules O₂ se rencontrent et se combinent en MgO. C\u2019est l\u2019équation 2 Mg + O₂ → 2 MgO qui libère lumière + chaleur.",
+  4:"PHASE 4 — Rotation : vue de dessus du cube. Un MÉCANISME À CLIQUET pousse une dent du pivot central, faisant tourner le cube de 90° pour présenter une face neuve."
 };
 let currentPhase=1, animTime=0;
 function setPhase(n){currentPhase=n;legende.textContent=PHASES[n];phaseBtns.forEach(b=>b.classList.toggle('active',+b.dataset.phase===n));animTime=0;}
@@ -428,95 +428,451 @@ function drawFilament(cx,cy,r,heatLevel=0){
 }
 
 function drawP1(){
-  // Vue rapprochée d'une ampoule au repos
-  drawBigBulb(500,200,70,0);
-  drawFilament(500,200,70,0);
+  // === VUE ÉCLATÉE : ampoule + zoom moléculaire (intérieur) ===
+
+  // Panneau gauche : ampoule entière
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,280);
+  ctx.strokeStyle='#7c8aa3';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,280);
+  ctx.fillStyle='#4a5775';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE (échelle 1:1)',240,75);
+
+  drawBigBulb(240,210,80,0);
+  drawFilament(240,210,80,0);
   // Étiquettes
-  ctx.fillStyle='#4a5775';ctx.font='600 13px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('• Verre scellé',600,150);
-  ctx.fillText('• Oxygène pur (O₂)',600,175);
-  ctx.fillText('• Filament Mg froid',600,200);
-  ctx.strokeStyle='#7c8aa3';ctx.lineWidth=1;ctx.setLineDash([4,3]);
-  ctx.beginPath();ctx.moveTo(595,170);ctx.lineTo(540,200);ctx.stroke();
+  ctx.fillStyle='#4a5775';ctx.font='600 11px Manrope';ctx.textAlign='left';
+  ctx.fillText('verre scellé',310,160);
+  ctx.fillText('filament Mg',310,200);
+  ctx.fillText('O₂ pur',310,240);
+  ctx.strokeStyle='#7c8aa3';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(305,160);ctx.lineTo(280,170);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(305,200);ctx.lineTo(260,210);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(305,240);ctx.lineTo(290,230);ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='#1a2236';ctx.font='italic 16px Playfair Display';
-  ctx.fillText("L'ampoule est en attente, prête à brûler.",60,80);
+
+  // Loupe + flèche zoom
+  ctx.strokeStyle='#ff8c42';ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(425,210);ctx.lineTo(580,210);
+  ctx.lineTo(575,205);ctx.moveTo(580,210);ctx.lineTo(575,215);
+  ctx.stroke();
+  ctx.fillStyle='#ff8c42';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('ZOOM ×10⁹',502,200);
+
+  // Panneau droit : VUE MOLÉCULAIRE
+  ctx.fillStyle='#0a0e18';
+  ctx.fillRect(595,80,360,280);
+  ctx.strokeStyle='#fdd835';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,280);
+  ctx.fillStyle='#fdd835';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 ÉCHELLE ATOMIQUE',775,75);
+
+  // Atomes Mg (filament : alignés)
+  for(let i=0;i<3;i++){
+    for(let j=0;j<3;j++){
+      const x=700+i*30, y=150+j*30;
+      // Drift léger
+      const dx=Math.sin(animTime+i*0.5)*1;
+      const dy=Math.cos(animTime+j*0.3)*1;
+      ctx.fillStyle='#7c8aa3';
+      ctx.beginPath();ctx.arc(x+dx,y+dy,9,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#b3bdcd';ctx.lineWidth=1;ctx.stroke();
+      ctx.fillStyle='#fff';ctx.font='bold 9px Manrope';ctx.textAlign='center';
+      ctx.fillText('Mg',x+dx,y+dy+3);
+    }
+  }
+  // Étiquette Mg
+  ctx.fillStyle='#7c8aa3';ctx.font='600 11px Manrope';ctx.textAlign='left';
+  ctx.fillText('atomes de magnésium',700,260);
+  ctx.fillText('(filament solide)',700,275);
+
+  // Molécules O₂ (gaz, mouvement plus libre)
+  for(let i=0;i<8;i++){
+    const baseX=620+i*40, baseY=110+(i%3)*15;
+    const dx=Math.sin(animTime*2+i*0.7)*15;
+    const dy=Math.cos(animTime*2+i*0.4)*8;
+    const x=baseX+dx, y=baseY+dy;
+    // 2 atomes O reliés
+    ctx.fillStyle='#3aa8c8';
+    ctx.beginPath();ctx.arc(x-5,y,7,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(x+5,y,7,0,Math.PI*2);ctx.fill();
+    // Liaison
+    ctx.strokeStyle='#7dc8de';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(x-3,y);ctx.lineTo(x+3,y);ctx.stroke();
+    // Lettre O
+    ctx.fillStyle='#fff';ctx.font='bold 8px Manrope';ctx.textAlign='center';
+    ctx.fillText('O',x-5,y+3);ctx.fillText('O',x+5,y+3);
+  }
+  ctx.fillStyle='#3aa8c8';ctx.font='600 11px Manrope';ctx.textAlign='left';
+  ctx.fillText('molécules O₂',730,330);
+  ctx.fillText('(oxygène gazeux libre)',730,345);
+
+  // Texte explicatif
+  ctx.fillStyle='#1a2236';ctx.font='italic 16px Playfair Display';ctx.textAlign='left';
+  ctx.fillText("Au repos : tout est prêt mais SÉPARÉ.",60,50);
+  ctx.fillText("Les atomes Mg attendent. Les O₂ flottent. Pas de réaction.",60,70);
 }
 
 function drawP2(){
-  const t=Math.min(animTime/1.2,1);
-  drawBigBulb(500,200,70,t*0.3);
-  drawFilament(500,200,70,t*0.5);
-  // Étincelle
-  if(t<1){
-    ctx.strokeStyle='#3fb8ff';ctx.lineWidth=2;
-    for(let i=0;i<8;i++){
-      const a=i*Math.PI/4+animTime*5;
-      const r1=20,r2=20+10*Math.sin(animTime*15+i);
-      ctx.beginPath();
-      ctx.moveTo(500+Math.cos(a)*r1,210+Math.sin(a)*r1*0.5);
-      ctx.lineTo(500+Math.cos(a)*r2,210+Math.sin(a)*r2*0.5);
-      ctx.stroke();
+  // === DÉCLENCHEUR + ZOOM SUR L'ARRIVÉE DE L'ÉTINCELLE ===
+  const t=Math.min(animTime/1.5,1);
+
+  // Panneau gauche : appareil photo + connexion électrique
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,280);
+  ctx.strokeStyle='#7c8aa3';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,280);
+  ctx.fillStyle='#4a5775';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('DÉCLENCHEUR PHOTO',240,75);
+
+  // Boitier appareil photo (très simplifié)
+  ctx.fillStyle='#3a4256';
+  ctx.fillRect(110,180,200,100);
+  ctx.strokeStyle='#1a2236';ctx.lineWidth=2;
+  ctx.strokeRect(110,180,200,100);
+  // Objectif
+  ctx.fillStyle='#0a0e18';
+  ctx.beginPath();ctx.arc(180,230,28,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#7c8aa3';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#3a4256';
+  ctx.beginPath();ctx.arc(180,230,18,0,Math.PI*2);ctx.fill();
+  // Bouton déclencheur
+  const pressed=t<0.4;
+  ctx.fillStyle=pressed?'#ff8c42':'#fdd835';
+  ctx.beginPath();ctx.arc(280,195,12,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#1a2236';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#1a2236';ctx.font='bold 16px Manrope';ctx.textAlign='center';
+  ctx.fillText('●',280,200);
+  // Cube à flashs en haut de l'appareil
+  ctx.fillStyle='#b3bdcd';
+  ctx.fillRect(160,140,40,40);
+  ctx.strokeStyle='#7c8aa3';ctx.strokeRect(160,140,40,40);
+  // Connexion fil rouge (court-circuit)
+  if(t>0.4){
+    const dashOffset=(animTime*30)%14;
+    ctx.strokeStyle='#ff8c42';ctx.lineWidth=2;
+    ctx.setLineDash([5,3]);ctx.lineDashOffset=-dashOffset;
+    ctx.beginPath();
+    ctx.moveTo(280,195);ctx.lineTo(280,160);ctx.lineTo(200,160);ctx.lineTo(200,140);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Petit éclair sur le cube
+    ctx.fillStyle='#fdd835';
+    ctx.font='bold 22px Manrope';ctx.textAlign='center';
+    ctx.fillText('⚡',180,170);
+  }
+  ctx.fillStyle='#4a5775';ctx.font='600 11px Manrope';ctx.textAlign='center';
+  ctx.fillText(pressed?'doigt sur déclencheur':'décharge envoyée',210,310);
+  ctx.fillText('au cube ↗',210,328);
+
+  // Panneau droit : ZOOM sur l'étincelle au niveau du filament
+  ctx.fillStyle='#0a0e18';
+  ctx.fillRect(595,80,360,280);
+  ctx.strokeStyle='#fdd835';ctx.strokeRect(595,80,360,280);
+  ctx.fillStyle='#fdd835';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 ARRIVÉE DE L\u2019ÉTINCELLE',775,75);
+
+  // Filament Mg (atomes qui commencent à vibrer)
+  const heat=Math.max(0,t*1.5-0.3);
+  for(let i=0;i<5;i++){
+    for(let j=0;j<5;j++){
+      const x=680+i*25, y=150+j*25;
+      // Vibration plus forte avec la chaleur
+      const vibe=heat*4;
+      const dx=(Math.random()-0.5)*vibe;
+      const dy=(Math.random()-0.5)*vibe;
+      // Couleur passe gris → orange → blanc
+      let c;
+      if(heat>0.7)c=`rgba(255,${200+heat*50},${100*heat},${0.9})`;
+      else if(heat>0.3)c=`rgba(${180+heat*60},${100+heat*100},${50},.9)`;
+      else c='#7c8aa3';
+      ctx.fillStyle=c;
+      ctx.beginPath();ctx.arc(x+dx,y+dy,7,0,Math.PI*2);ctx.fill();
+      if(heat>0.5){
+        ctx.shadowColor='#ff8c42';ctx.shadowBlur=heat*15;
+        ctx.fill();
+        ctx.shadowBlur=0;
+      }
+      ctx.fillStyle='#fff';ctx.font='bold 8px Manrope';ctx.textAlign='center';
+      ctx.fillText('Mg',x+dx,y+dy+3);
     }
   }
-  ctx.fillStyle='#3fb8ff';ctx.font='600 13px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('⚡ Étincelle électrique',600,180);
-  ctx.fillText('→ chauffe le filament',600,200);
-  ctx.fillStyle='#1a2236';ctx.font='italic 16px Playfair Display';
-  ctx.fillText("Le déclencheur envoie un courant : le filament chauffe.",60,80);
+
+  // Décharges électriques arrivant
+  if(t<0.95){
+    ctx.strokeStyle='#3fb8ff';ctx.lineWidth=2;
+    for(let i=0;i<6;i++){
+      const a=i*Math.PI/3+animTime*8;
+      const r1=130, r2=130+30*Math.abs(Math.sin(animTime*15+i));
+      ctx.beginPath();
+      ctx.moveTo(775+Math.cos(a)*r1,220+Math.sin(a)*r1);
+      ctx.lineTo(775+Math.cos(a)*r2,220+Math.sin(a)*r2);
+      ctx.stroke();
+    }
+    ctx.fillStyle='#3fb8ff';ctx.font='bold 18px Manrope';ctx.textAlign='center';
+    if(t<0.5){ctx.fillText('⚡',625,150);ctx.fillText('⚡',925,290);}
+  }
+
+  // Étiquette
+  ctx.fillStyle='#fdd835';ctx.font='600 11px Manrope';ctx.textAlign='left';
+  ctx.fillText('atomes Mg qui chauffent',640,335);
+  ctx.fillText('et commencent à vibrer',640,350);
+
+  ctx.fillStyle='#1a2236';ctx.font='italic 16px Playfair Display';ctx.textAlign='left';
+  ctx.fillText("Le bouton est pressé : un courant arrive sur le filament.",60,50);
+  ctx.fillText("Les atomes Mg s'agitent et chauffent → seuil d'inflammation.",60,70);
 }
 
 function drawP3(){
-  const intensity=Math.min(1,animTime*0.8);
+  // === COMBUSTION : Mg + O₂ → MgO (vue moléculaire de la réaction) ===
+  const t=Math.min(animTime/3,1);
+
+  // Panneau gauche : ampoule qui brille intensément
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,280);
+  ctx.strokeStyle='#7c8aa3';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,280);
+  ctx.fillStyle='#4a5775';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE',240,75);
+
+  const intensity=Math.min(1,t*2);
   const flicker=intensity*(0.85+Math.random()*0.15);
-  drawBigBulb(500,200,70,flicker,intensity>0.9);
-  drawFilament(500,200,70,Math.min(1,intensity));
-  // Particules
-  if(intensity>0.5&&intensity<1){
-    for(let i=0;i<12;i++){
+  drawBigBulb(240,210,80,flicker,intensity>0.95);
+  drawFilament(240,210,80,Math.min(1,intensity));
+
+  // Particules autour
+  if(intensity>0.4&&intensity<0.95){
+    for(let i=0;i<20;i++){
       const a=Math.random()*Math.PI*2;
-      const d=Math.random()*60;
-      ctx.fillStyle=`rgba(253,216,53,${1-d/60})`;
-      ctx.beginPath();ctx.arc(500+Math.cos(a)*d,200+Math.sin(a)*d,2,0,Math.PI*2);ctx.fill();
+      const d=Math.random()*70;
+      ctx.fillStyle=`rgba(253,216,53,${1-d/70})`;
+      ctx.beginPath();ctx.arc(240+Math.cos(a)*d,210+Math.sin(a)*d,2,0,Math.PI*2);ctx.fill();
     }
   }
-  // Réaction chimique
-  ctx.fillStyle='#1a2236';ctx.font='600 14px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('Mg + O₂  →  MgO + 💡 lumière + 🔥 chaleur',60,360);
-  ctx.font='italic 16px Playfair Display';
-  ctx.fillText(intensity<0.95?"Combustion : le magnésium brûle dans l'oxygène !":"Le filament a brûlé : la face est utilisée.",60,80);
+
+  // Panneau droit : ÉQUATION CHIMIQUE ANIMÉE
+  ctx.fillStyle='#0a0e18';
+  ctx.fillRect(595,80,360,280);
+  ctx.strokeStyle='#fdd835';ctx.strokeRect(595,80,360,280);
+  ctx.fillStyle='#fdd835';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 RÉACTION CHIMIQUE',775,75);
+
+  // === MEMBRES DE GAUCHE (réactifs) ===
+  // Mg
+  const reactPos=t<0.5?t*2:1; // se rapprochent puis fusionnent
+  const mgX=640-reactPos*20;
+  ctx.fillStyle='#7c8aa3';
+  ctx.beginPath();ctx.arc(mgX,180,16,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#b3bdcd';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='bold 14px Manrope';ctx.textAlign='center';
+  ctx.fillText('Mg',mgX,185);
+
+  // +
+  if(t<0.4){
+    ctx.fillStyle='#fff';ctx.font='bold 18px Manrope';
+    ctx.fillText('+',680,185);
+  }
+
+  // O₂
+  const o2X=720+reactPos*20;
+  // 2 atomes O reliés
+  ctx.fillStyle='#3aa8c8';
+  ctx.beginPath();ctx.arc(o2X-8,180,12,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(o2X+8,180,12,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#7dc8de';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(o2X-3,180);ctx.lineTo(o2X+3,180);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='bold 11px Manrope';ctx.textAlign='center';
+  ctx.fillText('O',o2X-8,184);ctx.fillText('O',o2X+8,184);
+
+  // === FLASH AU MOMENT DE LA COLLISION (t≈0.4-0.6) ===
+  if(t>0.35&&t<0.7){
+    const flashIntensity=1-Math.abs(t-0.5)*4;
+    ctx.fillStyle=`rgba(255,255,255,${flashIntensity*0.8})`;
+    ctx.beginPath();ctx.arc(700,180,50,0,Math.PI*2);ctx.fill();
+    // Étoiles éclair
+    ctx.strokeStyle=`rgba(253,216,53,${flashIntensity})`;
+    ctx.lineWidth=3;
+    for(let i=0;i<8;i++){
+      const a=i*Math.PI/4;
+      ctx.beginPath();
+      ctx.moveTo(700,180);
+      ctx.lineTo(700+Math.cos(a)*40,180+Math.sin(a)*40);
+      ctx.stroke();
+    }
+  }
+
+  // === FLÈCHE → ===
+  if(t>0.5){
+    const fade=Math.min(1,(t-0.5)*4);
+    ctx.fillStyle=`rgba(255,255,255,${fade})`;
+    ctx.font='bold 24px Manrope';ctx.textAlign='center';
+    ctx.fillText('→',775,185);
+  }
+
+  // === PRODUITS (à droite) ===
+  if(t>0.6){
+    const fade=Math.min(1,(t-0.6)*3);
+    // 2 molécules MgO formées
+    for(let m=0;m<2;m++){
+      const baseX=830+m*40;
+      const baseY=170+m*25;
+      // Atome Mg
+      ctx.globalAlpha=fade;
+      ctx.fillStyle='#7c8aa3';
+      ctx.beginPath();ctx.arc(baseX-7,baseY,11,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#b3bdcd';ctx.lineWidth=1.5;ctx.stroke();
+      // Atome O
+      ctx.fillStyle='#3aa8c8';
+      ctx.beginPath();ctx.arc(baseX+7,baseY,11,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#7dc8de';ctx.stroke();
+      // Liaison
+      ctx.strokeStyle='#fdd835';ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(baseX-3,baseY);ctx.lineTo(baseX+3,baseY);ctx.stroke();
+      // Lettres
+      ctx.fillStyle='#fff';ctx.font='bold 10px Manrope';ctx.textAlign='center';
+      ctx.fillText('Mg',baseX-7,baseY+3);ctx.fillText('O',baseX+7,baseY+3);
+      ctx.globalAlpha=1;
+    }
+  }
+
+  // === ÉQUATION ÉCRITE ===
+  ctx.fillStyle='#fdd835';ctx.font='bold 16px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('2 Mg  +  O₂  →  2 MgO',775,290);
+  ctx.fillStyle='#fff';ctx.font='600 12px Manrope';
+  ctx.fillText('+ ÉNERGIE LUMINEUSE 💡',775,315);
+  ctx.fillText('+ CHALEUR 🔥',775,335);
+
+  // Texte explicatif
+  ctx.fillStyle='#1a2236';ctx.font='italic 16px Playfair Display';ctx.textAlign='left';
+  ctx.fillText("La COMBUSTION : les atomes Mg et O₂ se combinent en MgO.",60,50);
+  ctx.fillText("L'énergie chimique se libère en LUMIÈRE et CHALEUR.",60,70);
 }
 
 function drawP4(){
-  const t=Math.min(animTime/2,1);
-  // Cube qui tourne (rotation simulée par compression horizontale)
+  // === MÉCANISME INTERNE DE ROTATION DU CUBE ===
+  const t=Math.min(animTime/2.5,1);
+
+  // Panneau gauche : vue externe du cube qui tourne
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,280);
+  ctx.strokeStyle='#7c8aa3';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,280);
+  ctx.fillStyle='#4a5775';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE',240,75);
+
+  // Cube avec face brûlée (à gauche)
   const angle=t*Math.PI/2;
   ctx.save();
-  ctx.translate(500,250);
-  // Approximation : on fait varier la largeur des faces
+  ctx.translate(240,210);
+  // Pseudo-rotation horizontale
   const sx=Math.cos(angle);
-  ctx.scale(Math.max(0.1,Math.abs(sx)),1);
+  ctx.scale(Math.max(0.15,Math.abs(sx)),1);
   drawCubeShape(0,0,80,1,0);
   ctx.restore();
-  // Faces brûlées vs neuves
-  ctx.fillStyle='#4a5775';ctx.font='600 13px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('🔥 Face précédente : brûlée',650,200);
-  ctx.fillText('✨ Nouvelle face : prête !',650,225);
+  // Indication des faces (B = brûlée, ✨ = neuve)
+  ctx.fillStyle='#ff8c42';
+  ctx.font='bold 22px Manrope';ctx.textAlign='center';
+  if(t<0.5)ctx.fillText('🔥',180,210);
+  else ctx.fillText('✨',300,210);
+
   // Petit symbole rotation
   ctx.strokeStyle='#ff8c42';ctx.lineWidth=3;
   ctx.beginPath();
-  ctx.arc(500,150,30,Math.PI*0.2,Math.PI*1.5+t*Math.PI*0.5);
+  ctx.arc(240,150,40,Math.PI*0.2,Math.PI*1.5+t*Math.PI*0.5);
   ctx.stroke();
-  // Flèche
   const ea=Math.PI*1.5+t*Math.PI*0.5;
-  const ex=500+Math.cos(ea)*30,ey=150+Math.sin(ea)*30;
+  const ex=240+Math.cos(ea)*40,ey=150+Math.sin(ea)*40;
   ctx.beginPath();
-  ctx.moveTo(ex,ey);ctx.lineTo(ex-8,ey-2);ctx.moveTo(ex,ey);ctx.lineTo(ex-2,ey+8);
+  ctx.moveTo(ex,ey);ctx.lineTo(ex-8,ey-3);ctx.moveTo(ex,ey);ctx.lineTo(ex-3,ey+8);
   ctx.stroke();
+  ctx.fillStyle='#ff8c42';ctx.font='600 11px Manrope';ctx.textAlign='center';
+  ctx.fillText('quart de tour',240,110);
 
-  ctx.fillStyle='#1a2236';ctx.font='italic 16px Playfair Display';
-  ctx.fillText("Le cube tourne : une face neuve face à l'objectif.",60,80);
-  ctx.fillText("Après 4 photos, le cube est jeté.",60,105);
+  // Panneau droit : MÉCANISME INTERNE (vue de dessus du cube)
+  ctx.fillStyle='#0a0e18';
+  ctx.fillRect(595,80,360,280);
+  ctx.strokeStyle='#fdd835';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,280);
+  ctx.fillStyle='#fdd835';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 MÉCANISME INTERNE (vue de dessus)',775,75);
+
+  // Cube vu du dessus = un carré avec 4 ampoules
+  const cx=775, cy=215;
+  const sz=110;
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(t*Math.PI/2); // Rotation effective
+  // Carré du cube
+  ctx.fillStyle='#3a4256';
+  ctx.fillRect(-sz/2,-sz/2,sz,sz);
+  ctx.strokeStyle='#b3bdcd';ctx.lineWidth=2;
+  ctx.strokeRect(-sz/2,-sz/2,sz,sz);
+
+  // 4 ampoules sur les 4 faces (vues de dessus = sur les 4 côtés)
+  const ampPositions=[
+    {x:0,y:-sz/2,burned:true,label:'F1'},   // Haut
+    {x:sz/2,y:0,burned:false,label:'F2'},   // Droite
+    {x:0,y:sz/2,burned:false,label:'F3'},   // Bas
+    {x:-sz/2,y:0,burned:false,label:'F4'}   // Gauche
+  ];
+  ampPositions.forEach((p,i)=>{
+    // Ampoule (cercle)
+    if(p.burned){
+      ctx.fillStyle='#3a4256';
+      ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#7c8aa3';ctx.lineWidth=1.5;ctx.stroke();
+      // X dessus
+      ctx.strokeStyle='#ff8c42';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(p.x-6,p.y-6);ctx.lineTo(p.x+6,p.y+6);
+      ctx.moveTo(p.x+6,p.y-6);ctx.lineTo(p.x-6,p.y+6);ctx.stroke();
+    }else{
+      ctx.fillStyle='#fdd835';
+      ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#e8b81a';ctx.stroke();
+    }
+    // Label
+    ctx.fillStyle='#fff';ctx.font='bold 8px JetBrains Mono';ctx.textAlign='center';
+    ctx.fillText(p.label,p.x,p.y+2);
+  });
+
+  // Pivot central + dent de cliquet
+  ctx.fillStyle='#fdd835';
+  ctx.beginPath();ctx.arc(0,0,8,0,Math.PI*2);ctx.fill();
+  // 4 dents (un quart de tour entre chaque)
+  ctx.strokeStyle='#fdd835';ctx.lineWidth=2;
+  for(let d=0;d<4;d++){
+    const a=d*Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*12,Math.sin(a)*12);
+    ctx.lineTo(Math.cos(a)*22,Math.sin(a)*22);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Cliquet externe (pièce qui pousse la dent à chaque déclenchement)
+  ctx.fillStyle='#7c8aa3';
+  ctx.beginPath();
+  ctx.moveTo(cx+sz/2+25,cy);
+  ctx.lineTo(cx+sz/2+50,cy-8);
+  ctx.lineTo(cx+sz/2+50,cy+8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle='#b3bdcd';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#fdd835';ctx.font='600 10px Manrope';ctx.textAlign='left';
+  ctx.fillText('cliquet',cx+sz/2+25,cy-15);
+  ctx.fillText('(pousse de 90°',cx+sz/2+25,cy+25);
+  ctx.fillText('après chaque flash)',cx+sz/2+25,cy+38);
+
+  // Étiquettes faces
+  ctx.fillStyle='#7c8aa3';ctx.font='600 10px Manrope';ctx.textAlign='left';
+  ctx.fillText('🔥 face brûlée',610,330);
+  ctx.fillText('💡 faces neuves (3)',610,348);
+
+  // Texte explicatif
+  ctx.fillStyle='#1a2236';ctx.font='italic 16px Playfair Display';ctx.textAlign='left';
+  ctx.fillText("Un MÉCANISME À CLIQUET fait pivoter le cube de 90°",60,50);
+  ctx.fillText("après chaque déclenchement, présentant une face neuve.",60,70);
 }
 
 drawAnim();

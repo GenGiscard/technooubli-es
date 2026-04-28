@@ -238,8 +238,8 @@ p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
       <div class="anim-controls">
         <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>Insertion</button>
         <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Sélection</button>
-        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Le bras agit</button>
-        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Lecture &amp; son</button>
+        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Vue intérieure</button>
+        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Vue éclatée lecture</button>
       </div>
     </div>
   </section>
@@ -301,6 +301,8 @@ p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
             <div class="jb-artist" id="jbArtist">Aucun disque</div>
             <div class="jb-title" id="jbTitle">— Sélectionne A1 à D4 —</div>
             <div class="jb-code" id="jbCode">▢▢</div>
+            <canvas id="jbEqualizer" width="180" height="40" style="display:block;margin:10px auto 4px;background:rgba(0,0,0,.4);border-radius:4px"></canvas>
+            <div style="height:4px;background:rgba(212,165,72,.15);border-radius:2px;overflow:hidden;margin:4px 12px 0"><div id="jbProgress" style="height:100%;width:0%;background:linear-gradient(90deg, #c8323a 0%, #d4a548 100%);transition:width .15s linear"></div></div>
           </div>
         </div>
         <div class="jb-control">
@@ -363,8 +365,8 @@ const phaseBtns=document.querySelectorAll('.phase-btn');
 const PHASES={
   1:{txt:"PHASE 1 — Insertion : le client glisse une pièce de 10 cents dans le monnayeur. Le mécanisme vérifie la pièce et active les boutons."},
   2:{txt:"PHASE 2 — Sélection : le client tape une lettre (B) puis un chiffre (7). La combinaison code la position du disque dans le magasin."},
-  3:{txt:"PHASE 3 — Le bras agit : un bras robotisé descend dans le magasin, attrape le bon disque et le sort de son emplacement."},
-  4:{txt:"PHASE 4 — Lecture : le disque arrive sur la platine, l\u2019aiguille lit le sillon, l\u2019ampli amplifie le signal, et les haut-parleurs diffusent la musique."}
+  3:{txt:"PHASE 3 — Vue intérieure : le capot est retiré ! Observe le BRAS ARTICULÉ qui descend, glisse latéralement jusqu\u2019à la rangée B colonne 3, attrape le disque et le transporte vers la platine."},
+  4:{txt:"PHASE 4 — Vue éclatée : la cellule lit le sillon (gauche), envoie un signal électrique faible à l\u2019AMPLIFICATEUR (centre, ×100), qui le restitue dans les HAUT-PARLEURS (droite). Voir les LEDs et le VU-mètre pulser !"}
 };
 let currentPhase=1, animTime=0;
 function setPhase(n){currentPhase=n;legende.textContent=PHASES[n].txt;phaseBtns.forEach(b=>b.classList.toggle('active',+b.dataset.phase===n));animTime=0;}
@@ -478,65 +480,385 @@ function drawP2(){
 }
 
 function drawP3(){
-  drawJukeboxBase();
-  const t=Math.min(animTime/2.5,1);
-  const targetX=170+5*19;
-  const armX=170+t*(targetX-170);
-  ctx.strokeStyle='#d4a548';ctx.lineWidth=4;ctx.lineCap='round';
+  // === VUE INTERNE DU MÉCANISME : magasin + bras articulé en gros plan ===
+
+  // Cadre vue interne (panneau central)
+  const px=80, py=50, pw=840, ph=350;
+  ctx.fillStyle='#fdf7ea';
+  ctx.fillRect(px,py,pw,ph);
+  ctx.strokeStyle='#8a1f26';
+  ctx.lineWidth=2;
+  ctx.strokeRect(px,py,pw,ph);
+  ctx.fillStyle='#8a1f26';
+  ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE INTÉRIEURE DU MÉCANISME (capot ouvert)',500,40);
+
+  // === MAGASIN DE DISQUES (à gauche, vue de profil) ===
+  const magX=130, magY=110, magW=320, magH=240;
+  ctx.fillStyle='rgba(212,165,72,.1)';
+  ctx.fillRect(magX,magY,magW,magH);
+  ctx.strokeStyle='#d4a548';
+  ctx.lineWidth=1.5;
+  ctx.strokeRect(magX,magY,magW,magH);
+
+  // Étagères horizontales (4 rangées : A, B, C, D)
+  const rows=['D','C','B','A'];
+  for(let r=0;r<4;r++){
+    const y=magY+30+r*50;
+    ctx.strokeStyle='rgba(138,31,38,.3)';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(magX+10,y+30);ctx.lineTo(magX+magW-10,y+30);
+    ctx.stroke();
+    // Étiquette rangée
+    ctx.fillStyle='#8a1f26';
+    ctx.font='700 14px Bungee';ctx.textAlign='left';
+    ctx.fillText(rows[r],magX-22,y+18);
+
+    // 4 disques par rangée
+    for(let c=0;c<4;c++){
+      const dx=magX+30+c*70;
+      const dy=y+12;
+      const isTarget=(rows[r]==='B'&&c===2); // B-3 (3ème colonne, 0-indexed = 2)
+      // Tranche de disque (vue de profil)
+      ctx.fillStyle=isTarget?'#d4a548':'#1a0a0d';
+      ctx.fillRect(dx,dy-15,4,30);
+      // Étiquette colonne
+      if(r===3){
+        ctx.fillStyle='#8a1f26';
+        ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+        ctx.fillText((c+1).toString(),dx+2,y+50);
+      }
+    }
+  }
+
+  // === BRAS ARTICULÉ (en mouvement) ===
+  // Phase 1 (0-1.5s) : descente vers la rangée B
+  // Phase 2 (1.5-3s) : extraction du disque B-3 vers la platine
+  const totalDur=4;
+  const t=Math.min(animTime/totalDur,1);
+
+  // Position cible : B-3 (rangée B = r=2, colonne c=2)
+  const targetRowY=magY+30+2*50+12; // B = 3ème depuis le bas
+  const targetX=magX+30+2*70+2;
+
+  // Position du chariot
+  let armX, armY, hasGrabbed=false;
+  if(t<0.4){
+    // Descente verticale du chariot vers la bonne rangée
+    armX=magX+magW/2;
+    armY=magY+30+(t/0.4)*(targetRowY-magY-30);
+  } else if(t<0.6){
+    // Translation horizontale jusqu'au disque
+    armX=magX+magW/2+((t-0.4)/0.2)*(targetX-magX-magW/2);
+    armY=targetRowY;
+  } else if(t<0.75){
+    // Saisie (bras qui s'enfonce)
+    armX=targetX;
+    armY=targetRowY;
+    hasGrabbed=true;
+  } else {
+    // Sortie + transport vers la platine (à droite du panneau)
+    const sub=(t-0.75)/0.25;
+    armX=targetX+sub*(680-targetX);
+    armY=targetRowY+sub*(220-targetRowY);
+    hasGrabbed=true;
+  }
+
+  // === RAIL HORIZONTAL DU CHARIOT ===
+  ctx.strokeStyle='#4a5775';
+  ctx.lineWidth=4;
   ctx.beginPath();
-  ctx.moveTo(armX,165);ctx.lineTo(armX,180+(t>0.7?10:0));
+  ctx.moveTo(magX+10,magY+30);ctx.lineTo(magX+magW-10,magY+30);
+  ctx.stroke();
+  // Rail vertical
+  ctx.strokeStyle='#4a5775';
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(armX,magY+30);ctx.lineTo(armX,armY-15);
+  ctx.stroke();
+
+  // === BRAS ARTICULÉ EN DÉTAIL ===
+  // Pince qui descend depuis le rail
+  ctx.strokeStyle='#8a1f26';
+  ctx.lineWidth=4;
+  ctx.beginPath();
+  ctx.moveTo(armX-1,armY-15);
+  ctx.lineTo(armX-1,armY+8);
+  ctx.stroke();
+  // Pince (deux mors)
+  ctx.fillStyle='#d4a548';
+  ctx.fillRect(armX-7,armY+5,3,10);
+  ctx.fillRect(armX+4,armY+5,3,10);
+  // Disque attrapé
+  if(hasGrabbed){
+    ctx.fillStyle='#d4a548';
+    ctx.fillRect(armX-3,armY-15,6,30);
+    // Halo
+    ctx.strokeStyle='rgba(212,165,72,.5)';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(armX,armY,15,0,Math.PI*2);
+    ctx.stroke();
+  }
+
+  // === PLATINE DE LECTURE (à droite, en attente du disque) ===
+  const platX=720, platY=220;
+  ctx.fillStyle='#1a0a0d';
+  ctx.beginPath();ctx.ellipse(platX,platY,55,12,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#3a2025';
+  ctx.beginPath();ctx.ellipse(platX,platY,55,11,0,0,Math.PI*2);ctx.fill();
+  // Pivot central
+  ctx.fillStyle='#8a1f26';
+  ctx.beginPath();ctx.arc(platX,platY-2,4,0,Math.PI*2);ctx.fill();
+  // Bras de lecture (replié au-dessus)
+  ctx.strokeStyle='#d4a548';
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(platX+45,platY-25);ctx.lineTo(platX+10,platY-5);
   ctx.stroke();
   ctx.fillStyle='#d4a548';
-  ctx.beginPath();ctx.arc(armX,180+(t>0.7?10:0),5,0,Math.PI*2);ctx.fill();
-  if(t>0.85&&animTime<5){
-    const liftY=Math.max(120,180-(animTime-2.1)*40);
-    ctx.fillStyle='#1a0a0d';
-    ctx.fillRect(armX-2.5,liftY,5,Math.min(40,180-liftY));
+  ctx.beginPath();ctx.arc(platX+45,platY-25,4,0,Math.PI*2);ctx.fill();
+  // Étiquette
+  ctx.fillStyle='#8a1f26';
+  ctx.font='600 10px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('PLATINE',platX,platY+30);
+
+  // === FLÈCHE TRAJECTOIRE ===
+  if(t>0.1&&t<0.95){
+    ctx.strokeStyle='#3fb8b0';
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath();
+    if(t<0.4){
+      // Descente
+      ctx.moveTo(armX,magY+30);ctx.lineTo(armX,targetRowY);
+    } else if(t<0.6){
+      // Translation horizontale
+      ctx.moveTo(magX+magW/2,targetRowY-15);ctx.lineTo(targetX,targetRowY-15);
+    } else if(t>0.75){
+      // Sortie
+      ctx.moveTo(targetX,targetRowY-15);
+      ctx.bezierCurveTo(targetX+100,targetRowY-50,600,180,armX,armY-15);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
   }
-  // étiquette de la pièce
+
+  // === ÉTIQUETTE DE LA PIÈCE EN COURS ===
   ctx.fillStyle='#3fb8b0';
-  ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('disque B-3',armX,160);
-  ctx.fillStyle='#8a1f26';ctx.textAlign='left';
-  ctx.font='italic 16px Playfair Display';
-  ctx.fillText('Le bras robotisé descend, attrape le disque B-3...',60,60);
-  ctx.fillText('...et le sort du magasin.',60,80);
+  ctx.font='600 12px JetBrains Mono';ctx.textAlign='center';
+  let stepLabel='';
+  if(t<0.4)stepLabel='ÉTAPE 1/4 : Descente du chariot';
+  else if(t<0.6)stepLabel='ÉTAPE 2/4 : Recherche colonne';
+  else if(t<0.75)stepLabel='ÉTAPE 3/4 : Saisie du disque B-3';
+  else if(t<1)stepLabel='ÉTAPE 4/4 : Transport vers la platine';
+  else stepLabel='✓ Disque sur la platine';
+  ctx.fillText(stepLabel,500,420);
 }
 
 function drawP4(){
-  drawJukeboxBase();
-  const cx=280,cy=240;
+  // === VUE EN COUPE : DISQUE SUR LA PLATINE + AMPLI + HP (vue éclatée intérieure) ===
+
+  // Cadre
+  const px=60, py=40, pw=880, ph=370;
+  ctx.fillStyle='#fdf7ea';
+  ctx.fillRect(px,py,pw,ph);
+  ctx.strokeStyle='#8a1f26';
+  ctx.lineWidth=2;
+  ctx.strokeRect(px,py,pw,ph);
+  ctx.fillStyle='#8a1f26';
+  ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE INTÉRIEURE : CHAÎNE DE LECTURE',500,30);
+
+  // === PLATINE (à gauche) ===
+  const plX=200, plY=180;
+  // Disque (vue de dessus, 3/4)
   const rot=animTime*1.5;
   ctx.save();
-  ctx.translate(cx,cy);
+  ctx.translate(plX,plY);
   ctx.rotate(rot);
   ctx.fillStyle='#1a0a0d';
-  ctx.beginPath();ctx.arc(0,0,40,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#c8323a';
-  ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='rgba(212,165,72,.2)';ctx.lineWidth=.5;
-  for(let r=15;r<40;r+=4){ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke();}
-  ctx.restore();
-  ctx.strokeStyle='#d4a548';ctx.lineWidth=2;
-  ctx.beginPath();
-  ctx.moveTo(cx+50,cy-30);ctx.lineTo(cx+30,cy-5);
-  ctx.stroke();
-  const notes=['♪','♫','♩','♬'];
-  for(let side of [-1,1]){
-    for(let i=0;i<3;i++){
-      const t=(animTime*0.6+i*0.5)%2;
-      const x=280+side*(140+t*60);
-      const y=380-t*50+Math.sin(animTime*3+i)*6;
-      const alpha=Math.max(0,1-t/2);
-      ctx.fillStyle=`rgba(63,184,176,${alpha})`;
-      ctx.font='bold 24px Georgia';
-      ctx.fillText(notes[i],x,y);
-    }
+  ctx.beginPath();ctx.arc(0,0,75,0,Math.PI*2);ctx.fill();
+  // Sillons concentriques
+  ctx.strokeStyle='rgba(212,165,72,.15)';
+  ctx.lineWidth=0.5;
+  for(let r=20;r<75;r+=4){
+    ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke();
   }
-  ctx.fillStyle='#8a1f26';ctx.textAlign='left';
-  ctx.font='italic 16px Playfair Display';
-  ctx.fillText('Le disque tourne, l\u2019aiguille lit le sillon,',60,60);
-  ctx.fillText('et la musique sort des haut-parleurs.',60,80);
+  // Étiquette rouge
+  ctx.fillStyle='#c8323a';
+  ctx.beginPath();ctx.arc(0,0,22,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fdf7ea';
+  ctx.font='700 9px Bungee';ctx.textAlign='center';
+  ctx.fillText('B-3',0,3);
+  // Trou
+  ctx.fillStyle='#1a0a0d';
+  ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  // Pivot platine
+  ctx.fillStyle='#3a2025';
+  ctx.beginPath();ctx.arc(plX,plY,8,0,Math.PI*2);ctx.fill();
+
+  // Bras de lecture qui touche le disque
+  const armEndX=plX+50, armEndY=plY-15;
+  ctx.strokeStyle='#d4a548';
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(plX+90,plY-65);
+  ctx.lineTo(armEndX,armEndY);
+  ctx.stroke();
+  // Pivot du bras
+  ctx.fillStyle='#d4a548';
+  ctx.beginPath();ctx.arc(plX+90,plY-65,5,0,Math.PI*2);ctx.fill();
+  // Cellule (tête de lecture)
+  ctx.fillStyle='#d4a548';
+  ctx.fillRect(armEndX-6,armEndY-3,10,8);
+  ctx.strokeStyle='#8a4f1f';
+  ctx.lineWidth=1;
+  ctx.strokeRect(armEndX-6,armEndY-3,10,8);
+  // Pointe diamant
+  ctx.fillStyle='#3fb8ff';
+  ctx.beginPath();ctx.arc(armEndX-1,armEndY+5,2,0,Math.PI*2);ctx.fill();
+
+  // Vibration cellule (petits cercles)
+  for(let i=0;i<3;i++){
+    const t=(animTime*2+i*0.3)%1;
+    ctx.strokeStyle=`rgba(63,184,176,${(1-t)*0.6})`;
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.arc(armEndX,armEndY+2,4+t*8,0,Math.PI*2);
+    ctx.stroke();
+  }
+
+  // Étiquette platine
+  ctx.fillStyle='#8a1f26';
+  ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('① PLATINE',plX,plY+95);
+
+  // === FIL ÉLECTRIQUE (signal vibration → électricité) ===
+  ctx.strokeStyle='#3fb8b0';
+  ctx.lineWidth=2;
+  // Animation impulsions
+  const dashOffset=(animTime*40)%14;
+  ctx.setLineDash([6,4]);
+  ctx.lineDashOffset=-dashOffset;
+  ctx.beginPath();
+  ctx.moveTo(plX+90,plY-65);
+  ctx.bezierCurveTo(plX+200,plY-100,plX+250,plY-30,plX+340,plY-30);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // === AMPLIFICATEUR (au centre) ===
+  const ampX=580, ampY=plY-40;
+  ctx.fillStyle='#3a2025';
+  ctx.fillRect(ampX-40,ampY-30,80,80);
+  ctx.strokeStyle='#d4a548';
+  ctx.lineWidth=2;
+  ctx.strokeRect(ampX-40,ampY-30,80,80);
+  // LEDs
+  for(let i=0;i<5;i++){
+    const litLevel=Math.max(0,Math.sin(animTime*3+i*0.4)*0.5+0.5);
+    ctx.fillStyle=i<3?`rgba(122,181,72,${litLevel})`:`rgba(232,184,26,${litLevel})`;
+    ctx.fillRect(ampX-30+i*13,ampY-20,8,3);
+  }
+  // VU-mètre (cadran)
+  ctx.fillStyle='#0a0608';
+  ctx.beginPath();ctx.arc(ampX,ampY+15,18,Math.PI,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#d4a548';
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.arc(ampX,ampY+15,18,Math.PI,Math.PI*2);ctx.stroke();
+  // Aiguille VU-mètre
+  const vuAngle=Math.PI+Math.PI*(0.2+Math.sin(animTime*4)*0.3+0.3);
+  ctx.strokeStyle='#c8323a';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(ampX,ampY+15);
+  ctx.lineTo(ampX+Math.cos(vuAngle)*16,ampY+15+Math.sin(vuAngle)*16);
+  ctx.stroke();
+  // Symbole + et étiquette
+  ctx.fillStyle='#d4a548';
+  ctx.font='bold 18px Manrope';ctx.textAlign='center';
+  ctx.fillText('×100',ampX,ampY+10);
+  ctx.fillStyle='#8a1f26';
+  ctx.font='600 11px JetBrains Mono';
+  ctx.fillText('② AMPLIFICATEUR',ampX,plY+95);
+
+  // === FILS VERS LES HP ===
+  ctx.strokeStyle='#3fb8b0';
+  ctx.lineWidth=3;
+  ctx.setLineDash([8,4]);
+  ctx.lineDashOffset=-dashOffset;
+  ctx.beginPath();
+  ctx.moveTo(ampX+40,ampY-15);
+  ctx.lineTo(750,ampY-15);
+  ctx.moveTo(ampX+40,ampY+15);
+  ctx.lineTo(750,ampY+15);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // === HAUT-PARLEURS (à droite, vue de profil) ===
+  const hpX=820;
+  // HP haut
+  ctx.fillStyle='#3a2025';
+  ctx.fillRect(hpX-30,ampY-40,60,40);
+  ctx.strokeStyle='#d4a548';
+  ctx.lineWidth=2;
+  ctx.strokeRect(hpX-30,ampY-40,60,40);
+  // Cône (membrane HP)
+  ctx.fillStyle='#1a0a0d';
+  ctx.beginPath();ctx.arc(hpX,ampY-20,15,0,Math.PI*2);ctx.fill();
+  // Pulsation cône
+  const hpPulse=Math.sin(animTime*8)*4;
+  ctx.fillStyle='#3a2025';
+  ctx.beginPath();ctx.arc(hpX,ampY-20,12+hpPulse*0.3,0,Math.PI*2);ctx.fill();
+  // HP bas
+  ctx.fillStyle='#3a2025';
+  ctx.fillRect(hpX-30,ampY,60,40);
+  ctx.strokeStyle='#d4a548';ctx.strokeRect(hpX-30,ampY,60,40);
+  ctx.fillStyle='#1a0a0d';
+  ctx.beginPath();ctx.arc(hpX,ampY+20,15,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#3a2025';
+  ctx.beginPath();ctx.arc(hpX,ampY+20,12+hpPulse*0.3,0,Math.PI*2);ctx.fill();
+
+  // Ondes sonores qui sortent
+  for(let i=0;i<4;i++){
+    const t=(animTime*1.2+i*0.4)%2;
+    const r=t*40;
+    const alpha=Math.max(0,(1-t/2)*0.7);
+    ctx.strokeStyle=`rgba(63,184,176,${alpha})`;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(hpX+r*0.5,ampY-20,r,-Math.PI/2.5,Math.PI/2.5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(hpX+r*0.5,ampY+20,r,-Math.PI/2.5,Math.PI/2.5);
+    ctx.stroke();
+  }
+
+  // Notes musicales
+  const notes=['♪','♫','♩'];
+  for(let i=0;i<3;i++){
+    const t=(animTime*0.6+i*0.5)%2;
+    const x=hpX+50+t*40;
+    const y=ampY+(i-1)*40-t*15+Math.sin(animTime*3+i)*5;
+    const alpha=Math.max(0,1-t/2);
+    ctx.fillStyle=`rgba(200,50,58,${alpha})`;
+    ctx.font='bold 22px Georgia';ctx.textAlign='center';
+    ctx.fillText(notes[i],x,y);
+  }
+
+  // Étiquette HP
+  ctx.fillStyle='#8a1f26';
+  ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('③ HAUT-PARLEURS',hpX,plY+95);
+
+  // === LÉGENDES SIGNAL ===
+  ctx.fillStyle='#3fb8b0';
+  ctx.font='600 10px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('signal électrique faible',plX+220,plY-105);
+  ctx.fillText('signal AMPLIFIÉ',680,ampY-50);
 }
 
 drawAnim();
@@ -574,8 +896,20 @@ let credits=5;
 let selectionStep=0;
 let pendingLetter=null;
 let isPlaying=false;
-let audioCtx2=null;
-function getAC(){if(!audioCtx2)audioCtx2=new (window.AudioContext||window.webkitAudioContext)();return audioCtx2;}
+const eqCanvas=document.getElementById('jbEqualizer');
+const eqCtx=eqCanvas.getContext('2d');
+const jbProgress=document.getElementById('jbProgress');
+
+// Dessine équaliseur 8 barres au repos
+function drawEqIdle(){
+  const W=eqCanvas.width,H=eqCanvas.height;
+  eqCtx.clearRect(0,0,W,H);
+  for(let i=0;i<8;i++){
+    eqCtx.fillStyle='rgba(212,165,72,.15)';
+    eqCtx.fillRect(8+i*22,H-6,16,4);
+  }
+}
+drawEqIdle();
 
 const KEYS=['A','B','C','D','1','2','3','4'];
 function buildKeypad(){
@@ -625,6 +959,7 @@ function playTrack(code){
   setStatus('🎶 LECTURE : '+tr.a+' — '+tr.t);
   isPlaying=true;
   const start=performance.now();
+  // Animation rotation disque
   function spin(){
     const t=(performance.now()-start)/1000;
     jbDiscGroup.style.transformOrigin='80px 80px';
@@ -633,34 +968,56 @@ function playTrack(code){
     else{jbDiscGroup.style.transform='rotate(0)';}
   }
   spin();
-  const ac=getAC();
-  const now=ac.currentTime;
-  const dur=0.4;
+
+  // Animation équaliseur visuel + barre de progression (remplace le son)
+  const dur=0.4; // seconde par "beat"
   const total=tr.pat.length*dur*2;
-  for(let rep=0;rep<2;rep++){
-    tr.pat.forEach((p,i)=>{
-      if(!p)return;
-      const f=tr.freqs[i%tr.freqs.length];
-      const o=ac.createOscillator();
-      const g=ac.createGain();
-      const filter=ac.createBiquadFilter();
-      filter.type='lowpass';filter.frequency.value=2500;
-      o.frequency.value=f;
-      o.type='triangle';
-      const start=now+rep*tr.pat.length*dur+i*dur;
-      g.gain.setValueAtTime(0,start);
-      g.gain.linearRampToValueAtTime(0.18,start+0.02);
-      g.gain.exponentialRampToValueAtTime(0.001,start+dur*0.9);
-      o.connect(filter).connect(g).connect(ac.destination);
-      o.start(start);o.stop(start+dur);
-    });
+  const W=eqCanvas.width,H=eqCanvas.height;
+  function drawEq(){
+    if(!isPlaying){drawEqIdle();return;}
+    const elapsed=(performance.now()-start)/1000;
+    const progress=Math.min(1,elapsed/total);
+    jbProgress.style.width=(progress*100)+'%';
+    eqCtx.clearRect(0,0,W,H);
+    // Barre par bande de fréquence (8 barres)
+    for(let i=0;i<8;i++){
+      // Pour chaque barre, calculer son amplitude actuelle selon le pattern
+      const beatIdx=Math.floor(elapsed/dur)%tr.pat.length;
+      const subBeat=(elapsed%dur)/dur; // 0 → 1 dans le beat actuel
+      let amp=0;
+      if(tr.pat[beatIdx]===1){
+        // Décroissance exponentielle après l'attaque
+        const decay=Math.exp(-subBeat*4);
+        // Différentes barres pulsent à différentes fréquences
+        const freqIdx=i%tr.freqs.length;
+        const freq=tr.freqs[freqIdx];
+        // Plus la fréquence est haute, plus la barre est à droite
+        const distance=Math.abs(i-((freq-200)/100));
+        amp=decay*Math.max(0.2,1-distance*0.15);
+      }
+      // Amplitude minimale pour visualisation toujours présente
+      amp=Math.max(0.1,amp);
+      const h=Math.max(4,amp*(H-8));
+      const grd=eqCtx.createLinearGradient(0,H-h,0,H);
+      grd.addColorStop(0,'#c8323a');
+      grd.addColorStop(0.6,'#d4a548');
+      grd.addColorStop(1,'#3fb8b0');
+      eqCtx.fillStyle=grd;
+      eqCtx.fillRect(8+i*22,H-h-2,16,h);
+    }
+    if(progress<1)requestAnimationFrame(drawEq);
+    else drawEqIdle();
   }
+  drawEq();
+
   setTimeout(()=>{
     isPlaying=false;
     selectionStep=0;
     pendingLetter=null;
     document.querySelectorAll('.jb-key').forEach(b=>b.classList.remove('lit'));
     setStatus(credits>0?'✓ Prêt — choisis un nouveau disque':'❌ Plus de crédits');
+    jbProgress.style.width='0%';
+    drawEqIdle();
   },(total*1000)+200);
 }
 
