@@ -233,8 +233,8 @@ p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
       <div class="legende" id="legende">Choisis une phase ci-dessous pour démarrer l&rsquo;animation.</div>
       <div class="anim-controls">
         <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>Le mélange</button>
-        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Le brassage</button>
-        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Action chimique</button>
+        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Vue intérieure</button>
+        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Zoom moléculaire</button>
         <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Rinçage</button>
       </div>
     </div>
@@ -374,9 +374,9 @@ const legende=document.getElementById('legende');
 const phaseBtns=document.querySelectorAll('.phase-btn');
 const PHASES={
   1:"PHASE 1 — Le mélange : on met dans la boule de l\u2019EAU, du LINGE sale, et un peu de LESSIVE. On visse le couvercle.",
-  2:"PHASE 2 — Le brassage : on tourne la manivelle. L\u2019action MÉCANIQUE secoue le linge, l\u2019eau pénètre les fibres et les frotte.",
-  3:"PHASE 3 — Action chimique : les molécules de SAVON entourent les particules de saleté. Elles les détachent des fibres comme par un aimant.",
-  4:"PHASE 4 — Rinçage : on jette l\u2019eau sale, on rince à l\u2019eau claire. La saleté + le savon partent ensemble. Le linge est PROPRE !"
+  2:"PHASE 2 — Vue intérieure : à l\u2019intérieur de la boule, les AILETTES brassent l\u2019eau et le linge à chaque rotation. Les vêtements sont secoués, les bulles montent.",
+  3:"PHASE 3 — Zoom moléculaire : une molécule de SAVON a 2 bouts. Sa TÊTE aime l\u2019eau (bleu), sa QUEUE aime la graisse (jaune). Elle attrape la saleté et l\u2019emporte.",
+  4:"PHASE 4 — Rinçage : on jette l\u2019eau sale qui contient les SALETÉS encapsulées par les molécules de savon (micelles). Le linge est PROPRE !"
 };
 let currentPhase=1, animTime=0;
 function setPhase(n){currentPhase=n;legende.textContent=PHASES[n];phaseBtns.forEach(b=>b.classList.toggle('active',+b.dataset.phase===n));animTime=0;}
@@ -513,123 +513,387 @@ function drawP1(){
 }
 
 function drawP2(){
-  // Brassage actif : rotation rapide
+  // === VUE INTÉRIEURE DE LA BOULE EN BRASSAGE ===
+
+  // Panneau gauche : vue extérieure
+  ctx.fillStyle='#fdf7ea';
+  ctx.fillRect(60,80,360,260);
+  ctx.strokeStyle='#3aa8c8';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,260);
+  ctx.fillStyle='#1f7898';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTÉRIEURE',240,75);
+
   const rot=animTime*4;
-  drawBall(500,200,90,rot,0.55,0.4,0.6);
-  // Flèches de rotation
-  ctx.strokeStyle='#3aa8c8';ctx.lineWidth=3;
-  for(let a=0;a<Math.PI*2;a+=Math.PI/2){
-    const x1=500+Math.cos(a+rot*0.5)*110;
-    const y1=200+Math.sin(a+rot*0.5)*110;
-    const x2=500+Math.cos(a+0.3+rot*0.5)*115;
-    const y2=200+Math.sin(a+0.3+rot*0.5)*115;
-    ctx.beginPath();
-    ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
-    ctx.stroke();
-  }
+  drawBall(240,210,80,rot,0.55,0.4,0.5);
   // Bonhomme qui tourne
   ctx.fillStyle='#c9a578';
-  ctx.beginPath();ctx.arc(290,160,16,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(105,170,14,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle='#1a3548';ctx.lineWidth=1.5;ctx.stroke();
   // Sueur
   ctx.fillStyle='#3aa8c8';
-  ctx.beginPath();ctx.arc(280,150,2,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(305,150,2,0,Math.PI*2);ctx.fill();
-  // Texte
-  ctx.fillStyle='#1a3548';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
-  ctx.fillText("On tourne la manivelle : action MÉCANIQUE.",60,80);
-  ctx.fillText("L'eau et le linge sont brassés énergiquement.",60,105);
-}
-
-function drawP3(){
-  // Zoom microscopique
-  ctx.fillStyle='rgba(255,255,255,.7)';
-  ctx.fillRect(150,80,700,260);
+  ctx.beginPath();ctx.arc(96,160,2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(118,160,2,0,Math.PI*2);ctx.fill();
+  // Flèches rotation
   ctx.strokeStyle='#3aa8c8';ctx.lineWidth=2;
-  ctx.strokeRect(150,80,700,260);
-  ctx.fillStyle='#3aa8c8';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('🔬 VUE MICROSCOPIQUE — fibres du tissu',500,100);
-  // Fibres horizontales
-  ctx.strokeStyle='#a08858';ctx.lineWidth=8;ctx.lineCap='round';
+  for(let a=0;a<Math.PI*2;a+=Math.PI/2){
+    const x1=240+Math.cos(a+rot*0.5)*98;
+    const y1=210+Math.sin(a+rot*0.5)*98;
+    const x2=240+Math.cos(a+0.3+rot*0.5)*103;
+    const y2=210+Math.sin(a+0.3+rot*0.5)*103;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  }
+
+  // Loupe (zoom vers panneau droit)
+  ctx.strokeStyle='#7ab548';ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(425,210);ctx.lineTo(580,210);
+  ctx.lineTo(575,205);ctx.moveTo(580,210);ctx.lineTo(575,215);
+  ctx.stroke();
+  ctx.fillStyle='#7ab548';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('intérieur →',502,200);
+
+  // Panneau droit : INTÉRIEUR DE LA BOULE EN ACTION
+  ctx.fillStyle='#7dc8de';
+  ctx.fillRect(595,80,360,260);
+  ctx.strokeStyle='#1f7898';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,260);
+  ctx.fillStyle='#1f7898';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 INTÉRIEUR DE LA BOULE',775,75);
+
+  // Eau colorée
+  const waterGrd=ctx.createLinearGradient(0,90,0,340);
+  waterGrd.addColorStop(0,'rgba(125,200,222,.8)');
+  waterGrd.addColorStop(1,'rgba(31,120,152,.85)');
+  ctx.fillStyle=waterGrd;
+  ctx.fillRect(595,150,360,190);
+
+  // Vagues internes (turbulence du brassage)
+  ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1.5;
   for(let i=0;i<3;i++){
-    const y=160+i*60;
     ctx.beginPath();
-    for(let x=200;x<=800;x+=4){
-      ctx.lineTo(x,y+Math.sin(x*0.05+i)*4);
+    for(let x=595;x<=955;x+=4){
+      const y=180+i*40+Math.sin((x+animTime*60+i*30)*0.04)*10;
+      if(x===595)ctx.moveTo(x,y);else ctx.lineTo(x,y);
     }
     ctx.stroke();
   }
-  // Particules de saleté (en cours d'arrachement)
-  const dirts=[
-    {x:300,y:160,grabbed:animTime>1.5},
-    {x:450,y:220,grabbed:animTime>2},
-    {x:600,y:280,grabbed:animTime>2.5},
-    {x:700,y:160,grabbed:animTime>3}
+
+  // AILETTES (reliefs internes qui brassent)
+  ctx.fillStyle='#1f7898';
+  // Ailette 1
+  const ailRot1=Math.sin(animTime*3)*15;
+  ctx.save();
+  ctx.translate(640,200);
+  ctx.rotate(ailRot1*Math.PI/180);
+  ctx.beginPath();
+  ctx.moveTo(-5,-25);ctx.lineTo(5,-25);ctx.lineTo(15,5);ctx.lineTo(-15,5);
+  ctx.closePath();ctx.fill();
+  ctx.restore();
+  // Ailette 2
+  ctx.save();
+  ctx.translate(910,200);
+  ctx.rotate(-ailRot1*Math.PI/180);
+  ctx.beginPath();
+  ctx.moveTo(-5,-25);ctx.lineTo(5,-25);ctx.lineTo(15,5);ctx.lineTo(-15,5);
+  ctx.closePath();ctx.fill();
+  ctx.restore();
+  ctx.fillStyle='#fdf7ea';ctx.font='600 9px Manrope';ctx.textAlign='center';
+  ctx.fillText('ailette',640,250);
+  ctx.fillText('ailette',910,250);
+
+  // LINGE qui flotte/se déforme dans l'eau (3 morceaux)
+  const linges=[
+    {bx:720,by:240,rot:animTime*1.5,scale:1},
+    {bx:800,by:215,rot:-animTime*1.2,scale:0.9},
+    {bx:780,by:280,rot:animTime*0.8,scale:1.1}
   ];
+  linges.forEach((l)=>{
+    ctx.save();
+    ctx.translate(l.bx+Math.sin(animTime*2+l.rot)*8,l.by+Math.cos(animTime*2+l.rot)*5);
+    ctx.rotate(l.rot);
+    ctx.scale(l.scale,l.scale);
+    // T-shirt déformé par les vagues
+    ctx.fillStyle='#f4f8fb';
+    ctx.beginPath();
+    ctx.ellipse(0,0,22,12,Math.sin(animTime*3)*0.3,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle='#a08858';ctx.lineWidth=1.5;ctx.stroke();
+    // Tâche de boue
+    ctx.fillStyle='rgba(120,80,40,.7)';
+    ctx.beginPath();ctx.arc(-5,2,4,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(8,-3,3,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  });
+
+  // Bulles
+  for(let i=0;i<10;i++){
+    const t=(animTime*0.6+i*0.4)%2;
+    const x=620+(i*32+animTime*10)%320;
+    const y=320-t*180;
+    const r=2+Math.sin(animTime*3+i)*1;
+    if(y>150){
+      ctx.fillStyle=`rgba(255,255,255,${0.7-t/3})`;
+      ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // Étiquettes
+  ctx.fillStyle='#1f7898';ctx.font='600 11px Manrope';ctx.textAlign='left';
+  ctx.fillText('💧 eau + lessive',610,100);
+  ctx.fillText('👕 linge brassé',610,120);
+
+  // Texte explicatif
+  ctx.fillStyle='#1a3548';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
+  ctx.fillText("Les ailettes intérieures BRASSENT le linge dans l'eau.",60,50);
+  ctx.fillText("Action MÉCANIQUE : les fibres sont secouées, l'eau pénètre.",60,70);
+}
+
+function drawP3(){
+  // === ZOOM MOLÉCULAIRE : MOLÉCULE DE SAVON EN ACTION ===
+
+  // Panneau gauche : explication d'une molécule de savon
+  ctx.fillStyle='#fdf7ea';
+  ctx.fillRect(60,80,360,260);
+  ctx.strokeStyle='#7ab548';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,260);
+  ctx.fillStyle='#558034';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 UNE MOLÉCULE DE SAVON',240,75);
+
+  // Grosse molécule de savon centrale
+  const molX=240, molY=200;
+  // Tête hydrophile (aime l'eau) - cercle bleu
+  ctx.fillStyle='#3aa8c8';
+  ctx.beginPath();ctx.arc(molX-50,molY,28,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#1f7898';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#fdf7ea';ctx.font='bold 11px Manrope';ctx.textAlign='center';
+  ctx.fillText('TÊTE',molX-50,molY-3);
+  ctx.font='bold 9px Manrope';
+  ctx.fillText('hydrophile',molX-50,molY+9);
+  // Queue lipophile (aime le gras) - chaîne ondulée jaune
+  ctx.strokeStyle='#dab23f';ctx.lineWidth=6;ctx.lineCap='round';
+  ctx.beginPath();
+  for(let x=0;x<=110;x+=2){
+    const y=molY+Math.sin(x*0.15)*6;
+    if(x===0)ctx.moveTo(molX-22+x,y);
+    else ctx.lineTo(molX-22+x,y);
+  }
+  ctx.stroke();
+  // Étiquette queue
+  ctx.fillStyle='#8a6515';ctx.font='bold 11px Manrope';ctx.textAlign='center';
+  ctx.fillText('QUEUE',molX+50,molY-15);
+  ctx.font='bold 9px Manrope';
+  ctx.fillText('lipophile',molX+50,molY+22);
+  ctx.fillText('(aime le gras)',molX+50,molY+34);
+
+  // Légendes
+  ctx.fillStyle='#1f7898';ctx.font='600 10px Manrope';ctx.textAlign='center';
+  ctx.fillText('💧 aime l\u2019eau',molX-50,molY+50);
+  ctx.fillStyle='#8a6515';
+  ctx.fillText('🔥 aime la saleté',molX+50,molY+58);
+
+  // Panneau droit : SAVON EN ACTION (encapsulation)
+  ctx.fillStyle='rgba(125,200,222,.6)';
+  ctx.fillRect(595,80,360,260);
+  ctx.strokeStyle='#1f7898';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,260);
+  ctx.fillStyle='#1a3548';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🧴 SAVON EN ACTION (dans l\u2019eau)',775,75);
+
+  // Fibres horizontales (tissu)
+  ctx.strokeStyle='#a08858';ctx.lineWidth=8;ctx.lineCap='round';
+  for(let i=0;i<2;i++){
+    const y=295+i*30;
+    ctx.beginPath();
+    for(let x=605;x<=945;x+=4){
+      ctx.lineTo(x,y+Math.sin(x*0.04+i)*2);
+    }
+    ctx.stroke();
+  }
+  ctx.fillStyle='#7a4520';ctx.font='600 10px Manrope';ctx.textAlign='left';
+  ctx.fillText('fibres du tissu',610,330);
+
+  // Tâche de saleté (graisse) sur les fibres - en cours d'arrachement
+  const t=animTime;
+  const dirts=[
+    {x:680,y:285,grabbed:t>0.8},
+    {x:780,y:300,grabbed:t>1.6},
+    {x:870,y:285,grabbed:t>2.4}
+  ];
+
+  // Molécules de savon libres (avec tête bleue + queue jaune)
+  for(let i=0;i<10;i++){
+    const t2=(animTime*0.5+i*0.4)%3;
+    const baseX=620+(i*35+animTime*15)%320;
+    const baseY=110+Math.sin(animTime*1.5+i)*15+i*3;
+    if(baseY<260){
+      // Tête bleue
+      ctx.fillStyle='#3aa8c8';
+      ctx.beginPath();ctx.arc(baseX,baseY,5,0,Math.PI*2);ctx.fill();
+      // Queue jaune
+      ctx.strokeStyle='#dab23f';ctx.lineWidth=2;ctx.lineCap='round';
+      ctx.beginPath();
+      ctx.moveTo(baseX,baseY);
+      ctx.lineTo(baseX+3,baseY+5);
+      ctx.lineTo(baseX-2,baseY+9);
+      ctx.lineTo(baseX+3,baseY+13);
+      ctx.stroke();
+    }
+  }
+
+  // Saletés et leur encapsulation par les molécules de savon
   dirts.forEach((d,i)=>{
     let x=d.x,y=d.y;
     if(d.grabbed){
-      const t=Math.min(1,(animTime-(1.5+i*0.5))*0.8);
-      x=d.x+t*60;y=d.y-t*40;
+      const ti=Math.min(1,(animTime-(0.8+i*0.8))*0.5);
+      x=d.x+Math.sin(animTime+i)*15;
+      y=d.y-ti*100; // Monte vers le haut (suspension dans l'eau)
     }
-    // Saleté
+    // Saleté (graisse brune)
     ctx.fillStyle='#7a3025';
-    ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fill();
-    // Bulle de savon autour
+    ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#4a1815';ctx.lineWidth=1;ctx.stroke();
+
+    // Si capturée, dessiner la "micelle" : 6 molécules de savon autour
     if(d.grabbed){
-      ctx.strokeStyle='#7ab548';ctx.lineWidth=2.5;
-      ctx.setLineDash([3,2]);
-      ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.stroke();
-      ctx.setLineDash([]);
+      for(let m=0;m<6;m++){
+        const a=m*Math.PI/3;
+        // Queue (vers la saleté)
+        ctx.strokeStyle='#dab23f';ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.moveTo(x+Math.cos(a)*7,y+Math.sin(a)*7);
+        ctx.lineTo(x+Math.cos(a)*16,y+Math.sin(a)*16);
+        ctx.stroke();
+        // Tête bleue (extérieure, vers l'eau)
+        ctx.fillStyle='#3aa8c8';
+        ctx.beginPath();ctx.arc(x+Math.cos(a)*20,y+Math.sin(a)*20,4,0,Math.PI*2);ctx.fill();
+      }
     }
   });
-  // Molécules de savon
-  for(let i=0;i<8;i++){
-    const t=(animTime+i*0.5)%3;
-    const x=200+(i*80+animTime*30)%600;
-    const y=130+Math.sin(animTime*2+i)*20+t*5;
-    ctx.fillStyle='rgba(122,181,72,.7)';
-    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
-    // Queue lipophile
-    ctx.strokeStyle='rgba(122,181,72,.5)';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+4,y+8);ctx.stroke();
-  }
+
+  // Flèches montrant que la saleté monte (suspension)
+  ctx.strokeStyle='rgba(122,181,72,.6)';ctx.lineWidth=2;
+  ctx.setLineDash([3,3]);
+  dirts.forEach((d,i)=>{
+    if(d.grabbed){
+      ctx.beginPath();
+      ctx.moveTo(d.x,d.y-15);
+      ctx.lineTo(d.x,d.y-50);
+      ctx.stroke();
+      // Flèche
+      ctx.beginPath();
+      ctx.moveTo(d.x-4,d.y-46);
+      ctx.lineTo(d.x,d.y-50);
+      ctx.lineTo(d.x+4,d.y-46);
+      ctx.stroke();
+    }
+  });
+  ctx.setLineDash([]);
+
+  // Étiquettes
+  ctx.fillStyle='#7a3025';ctx.font='600 10px Manrope';ctx.textAlign='right';
+  ctx.fillText('● saleté (graisse)',945,110);
+  ctx.fillStyle='#558034';
+  ctx.fillText('savon attache & arrache',945,128);
+
+  // Texte explicatif
   ctx.fillStyle='#1a3548';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
-  ctx.fillText("Le savon entoure la saleté → la décolle des fibres.",60,80);
-  ctx.fillStyle='#7ab548';ctx.font='600 13px JetBrains Mono';
-  ctx.fillText('🧴 SAVON',870,200);
-  ctx.fillStyle='#7a3025';
-  ctx.fillText('● saleté',870,230);
+  ctx.fillText("Action CHIMIQUE : les molécules de savon ont 2 bouts.",60,50);
+  ctx.fillText("Leur QUEUE accroche la saleté, leur TÊTE l'emporte dans l'eau.",60,70);
 }
 
 function drawP4(){
-  // Vidange
-  drawBall(500,200,90,0,0.2,0.05,0.85);
+  // === RINÇAGE : eau sale qui s'évacue ===
+
+  // Panneau gauche : vidange
+  ctx.fillStyle='#fdf7ea';
+  ctx.fillRect(60,80,360,260);
+  ctx.strokeStyle='#3aa8c8';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,260);
+  ctx.fillStyle='#1f7898';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VIDANGE DE LA BOULE',240,75);
+
+  // Boule (un peu inclinée pour vidanger)
+  ctx.save();
+  ctx.translate(220,200);
+  ctx.rotate(0.3);
+  drawBall(0,0,75,0,0.15,0.05,0.85);
+  ctx.restore();
+
   // Eau sale qui s'écoule
-  const t=(animTime*0.7)%1.5;
-  if(t<1.2){
+  const tFlow=(animTime*0.7)%1.5;
+  if(tFlow<1.2){
     ctx.fillStyle='rgba(120,80,40,.7)';
     ctx.beginPath();
-    ctx.moveTo(550,260);ctx.lineTo(560,260);
-    ctx.lineTo(580,260+t*100);ctx.lineTo(540,260+t*100);
+    ctx.moveTo(280,250);ctx.lineTo(290,250);
+    ctx.lineTo(305,250+tFlow*70);ctx.lineTo(265,250+tFlow*70);
     ctx.closePath();ctx.fill();
   }
   // Sol mouillé
-  ctx.fillStyle='rgba(120,80,40,.3)';
-  ctx.fillRect(530,355,80,15);
-  // Linge propre flottant à droite (sortie)
-  ctx.fillStyle='#f4f8fb';
-  ctx.strokeStyle='#3aa8c8';ctx.lineWidth=2;
-  ctx.beginPath();ctx.ellipse(800,180,40,18,0.2,0,Math.PI*2);ctx.fill();ctx.stroke();
-  ctx.fillStyle='#7ab548';ctx.font='bold 22px serif';
-  ctx.fillText('✓',790,186);
+  ctx.fillStyle='rgba(120,80,40,.4)';
+  ctx.fillRect(250,320,90,12);
   // Étiquette
-  ctx.fillStyle='#7ab548';ctx.font='600 13px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('Linge propre !',800,140);
-  // Texte
+  ctx.fillStyle='#7a3025';ctx.font='600 10px Manrope';ctx.textAlign='center';
+  ctx.fillText('eau SALE évacuée',290,335);
+
+  // Linge propre flottant à droite
+  ctx.fillStyle='#fdf7ea';
+  ctx.strokeStyle='#3aa8c8';ctx.lineWidth=2;
+  ctx.beginPath();ctx.ellipse(360,140,32,15,0.1,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#7ab548';ctx.font='bold 18px serif';ctx.textAlign='center';
+  ctx.fillText('✓',360,146);
+  ctx.fillStyle='#558034';ctx.font='600 10px Manrope';
+  ctx.fillText('linge propre !',360,170);
+
+  // Panneau droit : VUE MOLÉCULAIRE — saleté EMPORTÉE
+  ctx.fillStyle='rgba(120,80,40,.5)';
+  ctx.fillRect(595,80,360,260);
+  ctx.strokeStyle='#7a3025';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,260);
+  ctx.fillStyle='#fdf7ea';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 EAU SALE = SALETÉ EMPRISONNÉE',775,75);
+
+  // Plein de micelles (saleté + savon) qui descendent vers le bas (vidange)
+  for(let i=0;i<8;i++){
+    const t=(animTime*0.4+i*0.4)%3;
+    const baseX=620+(i*42)%320;
+    const baseY=110+t*80;
+    if(baseY<330){
+      // Saleté centrale
+      ctx.fillStyle='#7a3025';
+      ctx.beginPath();ctx.arc(baseX,baseY,5,0,Math.PI*2);ctx.fill();
+      // Micelle de savon autour
+      for(let m=0;m<5;m++){
+        const a=m*Math.PI*2/5+animTime;
+        // Tête bleue
+        ctx.fillStyle='#3aa8c8';
+        ctx.beginPath();ctx.arc(baseX+Math.cos(a)*12,baseY+Math.sin(a)*12,3,0,Math.PI*2);ctx.fill();
+        // Queue
+        ctx.strokeStyle='rgba(218,178,63,.7)';ctx.lineWidth=1.5;
+        ctx.beginPath();
+        ctx.moveTo(baseX+Math.cos(a)*5,baseY+Math.sin(a)*5);
+        ctx.lineTo(baseX+Math.cos(a)*10,baseY+Math.sin(a)*10);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Flèche descendante "vidange"
+  ctx.fillStyle='#7a3025';ctx.font='bold 26px Manrope';ctx.textAlign='center';
+  const arrowAnim=Math.sin(animTime*3)*5;
+  ctx.fillText('↓',775,170+arrowAnim);
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='600 11px Manrope';
+  ctx.fillText('saletés piégées',775,250);
+  ctx.fillText('partent avec l\u2019eau',775,266);
+
+  // Légende
+  ctx.fillStyle='#fdf7ea';ctx.font='600 10px Manrope';ctx.textAlign='right';
+  ctx.fillText('● saleté arrachée du tissu',945,310);
+  ctx.fillText('+ enveloppe de savon',945,326);
+
+  // Texte explicatif
   ctx.fillStyle='#1a3548';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
-  ctx.fillText("On vide l'eau sale, on rince. La saleté part avec.",60,80);
-  ctx.fillText("Le linge est prêt à sécher au soleil !",60,105);
+  ctx.fillText("On vide l'eau : les SALETÉS ENCAPSULÉES partent avec.",60,50);
+  ctx.fillText("Le linge est propre car la saleté n'est plus accrochée aux fibres.",60,70);
 }
 
 drawAnim();
