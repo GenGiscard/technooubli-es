@@ -235,9 +235,9 @@ p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
       <div class="legende" id="legende">Choisis une phase ci-dessous pour démarrer l&rsquo;animation.</div>
       <div class="anim-controls">
         <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>Le dispositif</button>
-        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Émission</button>
-        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Transmission</button>
-        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Réception</button>
+        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Voix → Membrane</button>
+        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Zoom sur ficelle</button>
+        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Membrane → Oreille</button>
       </div>
     </div>
   </section>
@@ -369,9 +369,9 @@ const legende=document.getElementById('legende');
 const phaseBtns=document.querySelectorAll('.phase-btn');
 const PHASES={
   1:"PHASE 1 — Le dispositif : deux gobelets, une ficelle. Les fonds des gobelets sont les MEMBRANES. La ficelle est attachée à chaque membrane par un nœud.",
-  2:"PHASE 2 — Émission : quand on parle dans le gobelet, la voix fait VIBRER l\u2019air. L\u2019air pousse la membrane qui vibre comme un petit tambour.",
-  3:"PHASE 3 — Transmission : la membrane qui vibre tire sur la ficelle. Une ONDE MÉCANIQUE part le long de la corde tendue (à plusieurs mètres par seconde).",
-  4:"PHASE 4 — Réception : l\u2019onde arrive à l\u2019autre membrane qui se met à vibrer à son tour. Elle pousse l\u2019air dans le 2ᵉ gobelet : le son est restitué !"
+  2:"PHASE 2 — À l\u2019échelle moléculaire : les molécules d\u2019air (O₂ et N₂) se compressent et POUSSENT la membrane. Elle se bombe vers la ficelle. C\u2019est l\u2019onde sonore qui devient onde mécanique.",
+  3:"PHASE 3 — Zoom sur la ficelle : chaque atome OSCILLE verticalement sur place. Mais l\u2019onde, elle, se propage horizontalement de gauche à droite (onde transverse).",
+  4:"PHASE 4 — La membrane 2 vibre, POUSSE les molécules d\u2019air à droite, qui se compressent et créent de nouvelles ondes sonores qui arrivent à l\u2019oreille."
 };
 let currentPhase=1, animTime=0;
 function setPhase(n){currentPhase=n;legende.textContent=PHASES[n];phaseBtns.forEach(b=>b.classList.toggle('active',+b.dataset.phase===n));animTime=0;}
@@ -446,119 +446,392 @@ function drawP1(){
 }
 
 function drawP2(){
-  // Gobelet gauche vibre
-  drawCup(220,250,1,'left');
-  drawCup(780,250,0,'right');
-  // Ficelle au repos pour cette phase
+  // === VUE ÉCLATÉE : voix → membrane (avec zoom moléculaire) ===
+
+  // Panneau gauche : vue d'ensemble (bonhomme + gobelet)
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,260);
   ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(220,280);ctx.lineTo(780,280);ctx.stroke();
-  ctx.fillStyle='#4a3a26';
-  ctx.beginPath();ctx.arc(220,280,4,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(780,280,4,0,Math.PI*2);ctx.fill();
-  // Bonhomme qui parle
+  ctx.strokeRect(60,80,360,260);
+  ctx.fillStyle='#7a5530';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE',240,75);
+
+  // Bonhomme
   ctx.fillStyle='#c9a578';
-  ctx.beginPath();ctx.arc(140,170,18,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(120,180,18,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle='#2a2218';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.arc(140,170,18,0,Math.PI*2);ctx.stroke();
-  // Ondes voix qui sortent vers le gobelet
+  ctx.beginPath();ctx.arc(120,180,18,0,Math.PI*2);ctx.stroke();
+  // Ondes voix
   for(let i=0;i<4;i++){
     const t=(animTime*0.8+i*0.5)%2;
-    const x=160+t*40;
+    const x=140+t*40;
     const alpha=Math.max(0,1-t/2);
     ctx.strokeStyle=`rgba(184,90,58,${alpha})`;
     ctx.lineWidth=2;
     ctx.beginPath();
-    ctx.arc(x,180,8,-Math.PI/3,Math.PI/3);
+    ctx.arc(x,190,8,-Math.PI/3,Math.PI/3);
     ctx.stroke();
   }
-  // "Allô !"
-  ctx.fillStyle='#b85a3a';ctx.font='italic 18px DM Serif Display';ctx.textAlign='left';
-  ctx.fillText('"Allô !"',95,150);
-  // Étiquettes
-  ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';
-  ctx.fillText("La voix arrive sur la membrane → elle vibre.",60,80);
-  ctx.fillText("Comme un tambour : l'air pousse, le tissu bouge.",60,105);
-  ctx.fillStyle='#b85a3a';ctx.font='600 13px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('🎤 air vibrant',220,330);
+  ctx.fillStyle='#b85a3a';ctx.font='italic 17px DM Serif Display';ctx.textAlign='left';
+  ctx.fillText('"Allô !"',75,160);
+  // Gobelet
+  drawCup(290,260,1,'left');
+
+  // Loupe vers la membrane
+  ctx.strokeStyle='#b85a3a';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(290,290,30,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(312,312);ctx.lineTo(330,330);ctx.stroke();
+
+  // Panneau droit : ZOOM SUR LA MEMBRANE (vue moléculaire)
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(595,80,360,260);
+  ctx.strokeStyle='#b85a3a';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,260);
+  ctx.fillStyle='#b85a3a';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 ZOOM SUR LA MEMBRANE',775,75);
+
+  // Vue : air à gauche / membrane au milieu / corde à droite
+  // MEMBRANE qui pulse (vibration verticale)
+  const pulse=Math.sin(animTime*8)*8;
+  const memX=775;
+
+  // Air à gauche : molécules N₂ et O₂ qui s'agglutinent vers la membrane
+  for(let i=0;i<14;i++){
+    const baseX=620+(i%5)*25;
+    const baseY=130+Math.floor(i/5)*45;
+    // Mouvement oscillant horizontal (compression/raréfaction)
+    const compression=Math.sin(animTime*8-baseX*0.05)*8;
+    const x=baseX+compression;
+    const y=baseY+(Math.random()-0.5)*2;
+    // Bleu = N₂, vert = O₂
+    const isO2=i%3===0;
+    ctx.fillStyle=isO2?'#3aa8c8':'#7a8a6a';
+    ctx.beginPath();ctx.arc(x-3,y,3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(x+3,y,3,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=isO2?'#7dc8de':'#a8b598';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x-1,y);ctx.lineTo(x+1,y);ctx.stroke();
+  }
+  ctx.fillStyle='#7a5530';ctx.font='600 10px Manrope';ctx.textAlign='center';
+  ctx.fillText('molécules d\u2019air',680,330);
+  ctx.fillText('(O₂ et N₂)',680,344);
+
+  // MEMBRANE (cercle qui pulse en haut, vue de profil)
+  ctx.strokeStyle='#7a5530';ctx.lineWidth=4;
+  ctx.beginPath();
+  // La membrane est une courbe verticale qui se bombe selon pulse
+  const memCurveX=memX+pulse*0.5;
+  ctx.moveTo(memCurveX-10,140);
+  ctx.quadraticCurveTo(memCurveX+pulse,210,memCurveX-10,280);
+  ctx.stroke();
+  // Surface de la membrane
+  ctx.fillStyle='rgba(212,183,140,.4)';
+  ctx.beginPath();
+  ctx.moveTo(memCurveX-10,140);
+  ctx.quadraticCurveTo(memCurveX+pulse,210,memCurveX-10,280);
+  ctx.lineTo(memX-15,280);
+  ctx.lineTo(memX-15,140);
+  ctx.closePath();
+  ctx.fill();
+  // Étiquette
+  ctx.fillStyle='#7a5530';ctx.font='600 10px Manrope';ctx.textAlign='center';
+  ctx.fillText('MEMBRANE',memX,330);
+  ctx.fillText('(fond du gobelet)',memX,344);
+
+  // Flèches d'oscillation membrane
+  if(Math.abs(pulse)>2){
+    ctx.fillStyle=`rgba(184,90,58,${Math.abs(pulse)/10})`;
+    ctx.font='bold 18px Manrope';ctx.textAlign='center';
+    if(pulse>0)ctx.fillText('→',memX+25,210);
+    else ctx.fillText('←',memX-25,210);
+  }
+
+  // Petite ficelle qui commence à vibrer derrière la membrane
+  ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let x=0;x<=80;x++){
+    const px=memX+5+x;
+    const py=210+Math.sin(animTime*8-x*0.2)*pulse*0.3;
+    if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.fillStyle='#7a5530';ctx.font='600 10px Manrope';
+  ctx.fillText('ficelle →',memX+50,330);
+
+  // Flèches "PUSH"
+  if(pulse>3){
+    ctx.fillStyle='rgba(184,90,58,.6)';
+    ctx.font='bold 22px Manrope';ctx.textAlign='left';
+    ctx.fillText('PUSH',640,200);
+  }
+
+  // Texte explicatif
+  ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';ctx.textAlign='left';
+  ctx.fillText("La voix fait vibrer l'AIR (compression).",60,50);
+  ctx.fillText("Les molécules POUSSENT la membrane → elle vibre comme un tambour.",60,70);
 }
 
 function drawP3(){
-  drawCup(220,250,1,'left');
-  drawCup(780,250,0,'right');
-  // Ficelle qui vibre : onde sinusoïdale qui se propage
+  // === ZOOM SUR LES FIBRES DE LA FICELLE ===
+
+  // Panneau gauche : vue d'ensemble du dispositif
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,260);
+  ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,260);
+  ctx.fillStyle='#7a5530';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE',240,75);
+
+  drawCup(120,200,1,'left');
+  drawCup(360,200,0,'right');
+  // Ficelle vibrante
   ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
   ctx.beginPath();
-  for(let x=220;x<=780;x++){
-    // Onde qui voyage de gauche à droite
-    const phase=(x-220)/40-animTime*4;
-    const t=(animTime*1.5)%2; // Front d'onde qui avance
-    const frontX=220+t*280;
+  for(let x=120;x<=360;x++){
+    const phase=(x-120)/15-animTime*4;
+    const tFront=(animTime*1.2)%2;
+    const frontX=120+tFront*240;
     let amp=0;
-    if(x<frontX){
-      amp=Math.sin(phase)*8*Math.max(0,1-(frontX-x)/300);
-    }
-    if(x===220)ctx.moveTo(x,280+amp);
-    else ctx.lineTo(x,280+amp);
+    if(x<frontX)amp=Math.sin(phase)*5*Math.max(0,1-(frontX-x)/200);
+    if(x===120)ctx.moveTo(x,230+amp);
+    else ctx.lineTo(x,230+amp);
   }
   ctx.stroke();
-  // Nœuds
-  ctx.fillStyle='#4a3a26';
-  ctx.beginPath();ctx.arc(220,280,4,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(780,280,4,0,Math.PI*2);ctx.fill();
-  // Flèche direction
-  const t=(animTime*1.5)%2;
-  const arrowX=220+t*280;
-  if(arrowX<780){
-    ctx.fillStyle='#b85a3a';ctx.font='bold 22px serif';ctx.textAlign='center';
-    ctx.fillText('→',arrowX,260);
+  // Loupe sur la ficelle au milieu
+  ctx.strokeStyle='#b85a3a';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(240,230,30,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(262,252);ctx.lineTo(280,270);ctx.stroke();
+  // Flèche direction onde
+  const t=(animTime*1.2)%2;
+  const arrowX=120+t*240;
+  if(arrowX<360){
+    ctx.fillStyle='#b85a3a';ctx.font='bold 18px serif';ctx.textAlign='center';
+    ctx.fillText('→',arrowX,210);
   }
+
+  // Panneau droit : ZOOM ULTRA sur la ficelle (vue ondulatoire)
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(595,80,360,260);
+  ctx.strokeStyle='#b85a3a';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,260);
+  ctx.fillStyle='#b85a3a';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 ZOOM SUR LA FICELLE',775,75);
+
+  // 5 brins épais qui ondulent (vrais fils torsadés)
+  const cordY=210;
+  for(let strand=-2;strand<=2;strand++){
+    const offsetY=strand*4;
+    ctx.strokeStyle=`rgb(${168+strand*5},${125+strand*8},${74+strand*4})`;
+    ctx.lineWidth=4;
+    ctx.beginPath();
+    for(let x=0;x<=320;x+=2){
+      const phase=x*0.06-animTime*5+strand*0.3;
+      const wave=Math.sin(phase)*15;
+      const px=620+x;
+      const py=cordY+offsetY+wave;
+      if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+  }
+
+  // Particules (atomes) le long de la corde qui montent et descendent
+  for(let i=0;i<14;i++){
+    const x=635+i*22;
+    const phase=(x-620)*0.06-animTime*5;
+    const wave=Math.sin(phase)*15;
+    const y=cordY+wave;
+    // Atome (cercle plus gros au sommet de l'onde)
+    const atomR=4+Math.abs(Math.sin(phase))*2;
+    ctx.fillStyle='#7a5530';
+    ctx.beginPath();ctx.arc(x,y,atomR,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#4a3a26';ctx.lineWidth=1;ctx.stroke();
+    // Petite flèche montrant le mouvement vertical
+    if(i%3===0){
+      const dy=Math.cos(phase)*15;
+      ctx.strokeStyle=`rgba(184,90,58,${Math.abs(dy)/15})`;
+      ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(x,y);
+      ctx.lineTo(x,y+dy*0.5);
+      // Pointe
+      if(dy>2){
+        ctx.moveTo(x,y+dy*0.5);
+        ctx.lineTo(x-3,y+dy*0.5-3);
+        ctx.moveTo(x,y+dy*0.5);
+        ctx.lineTo(x+3,y+dy*0.5-3);
+      } else if(dy<-2){
+        ctx.moveTo(x,y+dy*0.5);
+        ctx.lineTo(x-3,y+dy*0.5+3);
+        ctx.moveTo(x,y+dy*0.5);
+        ctx.lineTo(x+3,y+dy*0.5+3);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // Onde "front" qui voyage de gauche à droite
+  ctx.fillStyle='#b85a3a';ctx.font='bold 22px Manrope';ctx.textAlign='center';
+  const arrowAnim=(animTime*0.8)%1;
+  ctx.fillText('→',650+arrowAnim*250,135);
+
   // Étiquettes
+  ctx.fillStyle='#7a5530';ctx.font='600 10px Manrope';ctx.textAlign='left';
+  ctx.fillText('atomes oscillant verticalement',625,300);
+  ctx.fillText('mais l\u2019onde voyage horizontalement →',625,315);
+
+  // Conditions essentielles
+  ctx.fillStyle='#7a8a6a';ctx.font='600 11px Manrope';ctx.textAlign='center';
+  ctx.fillText('✓ ficelle TENDUE = onde se propage',775,150);
+
+  // Texte explicatif
   ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';ctx.textAlign='left';
-  ctx.fillText("La membrane vibre → la ficelle vibre.",60,80);
-  ctx.fillText("L'onde mécanique voyage le long de la corde tendue.",60,105);
-  ctx.fillStyle='#b85a3a';ctx.font='600 13px JetBrains Mono';ctx.textAlign='center';
-  ctx.fillText('💨 onde mécanique',500,335);
+  ctx.fillText("La membrane tire sur la ficelle → onde mécanique transverse.",60,50);
+  ctx.fillText("Chaque atome OSCILLE sur place. Seule l'onde voyage.",60,70);
 }
 
 function drawP4(){
-  drawCup(220,250,0,'left');
-  drawCup(780,250,1,'right');
-  // Ficelle vibrante stable
+  // === ARRIVÉE DE L'ONDE → MEMBRANE 2 → AIR → OREILLE ===
+
+  // Panneau gauche : vue d'ensemble (récepteur)
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,260);
+  ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,260);
+  ctx.fillStyle='#7a5530';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE : récepteur',240,75);
+
+  // Gobelet récepteur (vibre)
+  drawCup(150,260,1,'right');
+  // Ficelle vibrante (vient de gauche)
   ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
   ctx.beginPath();
-  for(let x=220;x<=780;x++){
-    const phase=(x-220)/40-animTime*4;
-    const amp=Math.sin(phase)*5;
-    if(x===220)ctx.moveTo(x,280+amp);
-    else ctx.lineTo(x,280+amp);
+  for(let x=80;x<=150;x++){
+    const phase=(x-80)*0.15-animTime*4;
+    const amp=Math.sin(phase)*4;
+    if(x===80)ctx.moveTo(x,290+amp);
+    else ctx.lineTo(x,290+amp);
   }
   ctx.stroke();
-  ctx.fillStyle='#4a3a26';
-  ctx.beginPath();ctx.arc(220,280,4,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(780,280,4,0,Math.PI*2);ctx.fill();
   // Bonhomme qui écoute (oreille collée au gobelet)
   ctx.fillStyle='#c9a578';
-  ctx.beginPath();ctx.arc(880,170,18,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(280,200,18,0,Math.PI*2);ctx.fill();
   ctx.strokeStyle='#2a2218';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.arc(880,170,18,0,Math.PI*2);ctx.stroke();
-  // Ondes son qui sortent du gobelet vers l'oreille
+  ctx.beginPath();ctx.arc(280,200,18,0,Math.PI*2);ctx.stroke();
+  // Oreille
+  ctx.fillStyle='#a08068';
+  ctx.beginPath();ctx.arc(265,205,5,0,Math.PI*2);ctx.fill();
+  // Ondes sons qui sortent du gobelet
   for(let i=0;i<4;i++){
     const t=(animTime*0.8+i*0.5)%2;
-    const x=820+t*40;
+    const x=210+t*50;
     const alpha=Math.max(0,1-t/2);
     ctx.strokeStyle=`rgba(122,138,106,${alpha})`;
     ctx.lineWidth=2;
     ctx.beginPath();
-    ctx.arc(x,180,8,Math.PI*2/3,Math.PI*4/3);
+    ctx.arc(x,210,8,Math.PI*2/3,Math.PI*4/3);
     ctx.stroke();
   }
-  // "Allô" à droite
-  ctx.fillStyle='#7a8a6a';ctx.font='italic 18px DM Serif Display';ctx.textAlign='left';
-  ctx.fillText('"Allô !"',830,150);
-  // Étiquettes
-  ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';
-  ctx.fillText("La 2ᵉ membrane vibre à son tour → elle pousse l'air.",60,80);
-  ctx.fillText("L'oreille reçoit le son. Le message est passé !",60,105);
+  ctx.fillStyle='#7a8a6a';ctx.font='italic 17px DM Serif Display';ctx.textAlign='left';
+  ctx.fillText('"Allô !"',230,180);
+
+  // Loupe sur la membrane
+  ctx.strokeStyle='#b85a3a';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(120,290,28,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(140,310);ctx.lineTo(155,325);ctx.stroke();
+
+  // Panneau droit : ZOOM sur la membrane qui restitue le son
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(595,80,360,260);
+  ctx.strokeStyle='#b85a3a';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,260);
+  ctx.fillStyle='#b85a3a';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 MEMBRANE → AIR → OREILLE',775,75);
+
+  // Ficelle qui arrive de gauche (avec onde)
+  ctx.strokeStyle='#a87d4a';ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let x=0;x<=80;x++){
+    const phase=x*0.2-animTime*5;
+    const px=615+x;
+    const py=200+Math.sin(phase)*8;
+    if(x===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.fillStyle='#7a5530';ctx.font='600 10px Manrope';ctx.textAlign='center';
+  ctx.fillText('ficelle vibrante',650,255);
+
+  // MEMBRANE 2 (vue de profil, qui pulse)
+  const pulse=Math.sin(animTime*8)*8;
+  const memX=720;
+  ctx.strokeStyle='#7a5530';ctx.lineWidth=4;
+  ctx.beginPath();
+  ctx.moveTo(memX,140);
+  ctx.quadraticCurveTo(memX+pulse,200,memX,260);
+  ctx.stroke();
+  ctx.fillStyle='rgba(212,183,140,.4)';
+  ctx.beginPath();
+  ctx.moveTo(memX,140);
+  ctx.quadraticCurveTo(memX+pulse,200,memX,260);
+  ctx.lineTo(memX+5,260);
+  ctx.lineTo(memX+5,140);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle='#7a5530';ctx.font='600 10px Manrope';ctx.textAlign='center';
+  ctx.fillText('MEMBRANE 2',memX,290);
+
+  // Air qui sort à droite : molécules POUSSÉES par la membrane
+  for(let i=0;i<14;i++){
+    const baseX=750+(i%5)*25;
+    const baseY=140+Math.floor(i/5)*40;
+    // Mouvement oscillant horizontal (compression/raréfaction propagée)
+    const compression=Math.sin(animTime*8-baseX*0.05+1)*8;
+    const x=baseX+compression;
+    const y=baseY+(Math.random()-0.5)*2;
+    const isO2=i%3===0;
+    ctx.fillStyle=isO2?'#3aa8c8':'#7a8a6a';
+    ctx.beginPath();ctx.arc(x-3,y,3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(x+3,y,3,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=isO2?'#7dc8de':'#a8b598';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x-1,y);ctx.lineTo(x+1,y);ctx.stroke();
+  }
+
+  // Flèche PUSH (membrane → air)
+  if(pulse>3){
+    ctx.fillStyle='rgba(122,138,106,.7)';
+    ctx.font='bold 22px Manrope';ctx.textAlign='left';
+    ctx.fillText('PUSH →',730,170);
+  }
+
+  // Oreille à droite (juste un demi-cercle stylisé)
+  const earX=900;
+  ctx.fillStyle='#c9a578';
+  ctx.beginPath();
+  ctx.arc(earX,200,18,Math.PI*0.5,Math.PI*1.5);
+  ctx.lineTo(earX-5,182);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle='#7a5530';ctx.lineWidth=1.5;
+  ctx.stroke();
+  // Conduit auditif
+  ctx.fillStyle='#3a2818';
+  ctx.beginPath();ctx.arc(earX-5,200,6,0,Math.PI*2);ctx.fill();
+  // Ondes vers l'oreille
+  for(let i=0;i<3;i++){
+    const t=(animTime*1.5+i*0.5)%2;
+    const x=850+t*30;
+    const alpha=Math.max(0,1-t/2);
+    ctx.strokeStyle=`rgba(122,138,106,${alpha})`;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(x,200,6,-Math.PI/3,Math.PI/3);
+    ctx.stroke();
+  }
+  ctx.fillStyle='#7a5530';ctx.font='600 10px Manrope';ctx.textAlign='center';
+  ctx.fillText('oreille',earX,255);
+
+  // Texte explicatif
+  ctx.fillStyle='#2a2218';ctx.font='italic 16px DM Serif Display';ctx.textAlign='left';
+  ctx.fillText("L'onde arrive sur la 2ᵉ membrane → elle vibre.",60,50);
+  ctx.fillText("La membrane POUSSE l'air → recrée des ondes sonores → l'oreille entend.",60,70);
 }
 
 drawAnim();
@@ -589,6 +862,7 @@ let best=0;
 let isTesting=false;
 let labTime=0;
 let waveAmp=0;
+let receivedDisplay=null;
 
 function drawLab(){
   const W=labCanvas.width,H=labCanvas.height;
@@ -677,6 +951,62 @@ function drawLab(){
   lctx.font='600 11px JetBrains Mono';
   lctx.fillText(tension<0.3?'⚠ TROP MOU':(tension>0.7?'✓ BIEN TENDU':'~ moyen'),250,290);
 
+  // Texte "ALLÔ !" qui sort de l'émetteur (toujours net)
+  if(isTesting){
+    const tNow=(performance.now()-(receivedDisplay?receivedDisplay.startTime:labTime*1000))/1000;
+    if(tNow<2){
+      const fade=Math.max(0,1-tNow/2);
+      lctx.fillStyle=`rgba(232,243,248,${fade})`;
+      lctx.font='italic 14px DM Serif Display';
+      lctx.textAlign='left';
+      lctx.fillText('"ALLÔ !"',30,80);
+      // petites ondes voix qui sortent
+      lctx.strokeStyle=`rgba(232,243,248,${fade*0.7})`;
+      lctx.lineWidth=1.5;
+      for(let i=0;i<3;i++){
+        const wt=(tNow*1.5+i*0.4)%1.5;
+        lctx.beginPath();
+        lctx.arc(70+wt*30,100,8,-Math.PI/3,Math.PI/3);
+        lctx.stroke();
+      }
+    }
+  }
+
+  // Texte reçu côté récepteur (apparaît après l'onde, qualité variable)
+  if(receivedDisplay){
+    const t=(performance.now()-receivedDisplay.startTime)/1000;
+    if(t>0.6&&t<3){
+      const fade=t<2.5?1:(3-t)/0.5;
+      const q=receivedDisplay.quality;
+      // Couleur selon qualité
+      let color;
+      if(q>=0.8)color=`rgba(168,184,152,${fade})`;
+      else if(q>=0.6)color=`rgba(212,183,140,${fade})`;
+      else if(q>=0.4)color=`rgba(255,180,100,${fade})`;
+      else color=`rgba(184,90,58,${fade})`;
+      lctx.fillStyle=color;
+      // Police de + en + déformée selon qualité
+      const fontSize=14+q*4;
+      lctx.font=`italic ${fontSize}px DM Serif Display`;
+      lctx.textAlign='right';
+      // Tremblement si mauvaise qualité
+      const shake=(1-q)*4;
+      const sx=470+(Math.random()-0.5)*shake;
+      const sy=80+(Math.random()-0.5)*shake;
+      lctx.fillText('"'+receivedDisplay.text+'"',sx,sy);
+      // Petites ondes voix sortantes du récepteur (intensité = qualité)
+      lctx.strokeStyle=color;
+      lctx.lineWidth=1.5;
+      for(let i=0;i<3;i++){
+        const wt=(t*1.5+i*0.4)%1.5;
+        lctx.beginPath();
+        lctx.arc(420-wt*30,100,8*q,Math.PI*2/3,Math.PI*4/3);
+        lctx.stroke();
+      }
+    }
+    if(t>3)receivedDisplay=null;
+  }
+
   if(isTesting){
     waveAmp=Math.max(0,waveAmp-0.015);
     if(waveAmp<=0)isTesting=false;
@@ -707,20 +1037,16 @@ tensionSlider.addEventListener('input',()=>{
 document.getElementById('btnTest').addEventListener('click',()=>{
   // Score combiné
   const tension=+tensionSlider.value/100;
-  // Tension : si <0.3, score s'effondre. Si entre 0.7 et 0.9, optimal. Si =1, légèrement moins (ficelle qui casse).
   let tensionScore;
   if(tension<0.3)tensionScore=tension*0.3;
   else if(tension<0.7)tensionScore=0.3+((tension-0.3)/0.4)*0.6;
   else if(tension<=0.9)tensionScore=0.9+((tension-0.7)/0.2)*0.1;
   else tensionScore=0.9-((tension-0.9)/0.1)*0.2;
-  // Pondération
   const matScore=MAT[curMat].score/100;
   const cupScore=CUP[curCup].score/100;
-  // Score global = produit (toute faiblesse compromet la transmission)
   const total=Math.round(matScore*cupScore*tensionScore*100);
   const stars=Math.max(1,Math.min(5,Math.round(total/20)));
   qStars.innerHTML='★'.repeat(stars).split('').map(s=>'<span class="on">★</span>').join('')+'☆'.repeat(5-stars);
-  // Message contextuel
   let msg;
   if(total>=80)msg='🏆 Transmission cristalline ! '+MAT[curMat].note+'. '+CUP[curCup].note+'.';
   else if(total>=60)msg='👍 Bon test. '+(tension<0.5?'Tends mieux la ficelle.':MAT[curMat].note+'.');
@@ -728,23 +1054,17 @@ document.getElementById('btnTest').addEventListener('click',()=>{
   else msg='💔 Échec. '+(tension<0.3?'Tends la ficelle !':(curMat==='elastique'?'L\u2019élastique absorbe tout.':MAT[curMat].note+'.'));
   qMsg.textContent=msg+' Score : '+total+'/100';
 
-  // Lance animation onde
+  // Lance animation onde + texte reçu visuel (remplace le son)
   isTesting=true;
   waveAmp=Math.max(0.2,total/100);
-  // Son synthétique selon qualité
-  const ac=new (window.AudioContext||window.webkitAudioContext)();
-  const o=ac.createOscillator();
-  const g=ac.createGain();
-  const filter=ac.createBiquadFilter();
-  filter.type='lowpass';
-  filter.frequency.value=300+total*30; // plus c'est mauvais, plus c'est sourd
-  o.frequency.value=440;
-  o.type='sawtooth';
-  o.connect(filter).connect(g).connect(ac.destination);
-  g.gain.setValueAtTime(0,ac.currentTime);
-  g.gain.linearRampToValueAtTime(Math.max(0.05,total/300),ac.currentTime+0.05);
-  g.gain.linearRampToValueAtTime(0,ac.currentTime+0.5);
-  o.start();o.stop(ac.currentTime+0.5);
+  // Détermine le texte reçu selon la qualité
+  let receivedText;
+  if(total>=80)receivedText='ALLÔ !';
+  else if(total>=60)receivedText='ALL... !';
+  else if(total>=40)receivedText='A.L.O ?';
+  else if(total>=20)receivedText='...?';
+  else receivedText='✗ rien';
+  receivedDisplay={text:receivedText,quality:total/100,startTime:performance.now()};
 
   if(total>best){best=total;bestScore.textContent=best;showToast('🏆 Nouveau meilleur score : '+best);}
 });
