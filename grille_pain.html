@@ -227,9 +227,9 @@ p.lead{font-size:19px;color:var(--ink-soft);max-width:680px}
       <div class="legende" id="legende">Choisis une phase ci-dessous pour démarrer l&rsquo;animation.</div>
       <div class="anim-controls">
         <button class="phase-btn active" data-phase="1"><span class="pn">PHASE 01</span>Les braises</button>
-        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Le rayonnement</button>
-        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Transfert au pain</button>
-        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Réaction de Maillard</button>
+        <button class="phase-btn" data-phase="2"><span class="pn">PHASE 02</span>Photons IR (zoom)</button>
+        <button class="phase-btn" data-phase="3"><span class="pn">PHASE 03</span>Coupe du pain</button>
+        <button class="phase-btn" data-phase="4"><span class="pn">PHASE 04</span>Réaction Maillard</button>
       </div>
     </div>
   </section>
@@ -350,9 +350,9 @@ const legende=document.getElementById('legende');
 const phaseBtns=document.querySelectorAll('.phase-btn');
 const PHASES={
   1:"PHASE 1 — Les braises : le bois a fini de flamber. Il reste des morceaux rouges incandescents (~800°C). C\u2019est la SOURCE d\u2019énergie thermique.",
-  2:"PHASE 2 — Le rayonnement : les braises émettent de la chaleur sous forme d\u2019ONDES INFRAROUGES invisibles, comme la lumière. La chaleur voyage dans l\u2019air sans contact.",
-  3:"PHASE 3 — Le transfert : les rayons IR atteignent le pain et chauffent sa surface. Plus le pain est PROCHE, plus il chauffe vite (loi du carré inverse).",
-  4:"PHASE 4 — La réaction de Maillard : à partir de ~140°C, les sucres et protéines du pain réagissent. La croûte se forme, dore, et libère les arômes du pain grillé."
+  2:"PHASE 2 — Vue quantique : les atomes très chauds de la braise émettent des PHOTONS infrarouges (γ). Ce sont des particules de lumière qui voyagent dans l\u2019air sans contact.",
+  3:"PHASE 3 — Coupe du pain : les photons IR frappent la CROÛTE et la chauffent. L\u2019eau (H₂O) s\u2019évapore vers le haut. La mie au centre reste plus tiède.",
+  4:"PHASE 4 — Réaction de Maillard : à 140°C, les SUCRES (glucose) et les PROTÉINES (acides aminés) se combinent en MÉLANOÏDINES, qui donnent la couleur brune et les arômes."
 };
 let currentPhase=1, animTime=0;
 function setPhase(n){currentPhase=n;legende.textContent=PHASES[n];phaseBtns.forEach(b=>b.classList.toggle('active',+b.dataset.phase===n));animTime=0;}
@@ -447,94 +447,404 @@ function drawP1(){
 }
 
 function drawP2(){
-  drawEmbers(500,340,1);
-  // Ondes IR sortant des braises
+  // === VUE ÉCLATÉE : photons IR émis par les braises ===
+
+  // Panneau gauche : braises avec ondes
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,280);
+  ctx.strokeStyle='#7a5c3a';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,280);
+  ctx.fillStyle='#7a5c3a';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE : RAYONNEMENT',240,75);
+
+  // Braises au centre du panneau
+  drawEmbers(240,300,1);
+
+  // Ondes IR concentriques (sphériques)
   for(let i=0;i<5;i++){
     const t=(animTime*0.6+i*0.4)%2;
-    const r=20+t*180;
+    const r=20+t*120;
     const alpha=Math.max(0,(1-t/2)*0.5);
     ctx.strokeStyle=`rgba(232,93,42,${alpha})`;
     ctx.lineWidth=2;
     ctx.beginPath();
-    ctx.arc(500,340,r,Math.PI*1.1,Math.PI*1.9);
+    ctx.arc(240,300,r,Math.PI*1.1,Math.PI*1.9);
     ctx.stroke();
   }
-  // Symboles IR
-  ctx.fillStyle='#e85d2a';ctx.font='600 14px JetBrains Mono';ctx.textAlign='center';
-  for(let i=0;i<3;i++){
-    const t=(animTime*0.5+i*0.7)%2;
-    const y=340-t*100;
+
+  // Symboles IR montants
+  for(let i=0;i<4;i++){
+    const t=(animTime*0.5+i*0.5)%2;
+    const y=290-t*120;
+    const x=190+i*30;
     const alpha=Math.max(0,1-t/2);
     ctx.fillStyle=`rgba(232,93,42,${alpha})`;
-    ctx.fillText('IR',460+i*30,y);
+    ctx.font='600 13px JetBrains Mono';ctx.textAlign='center';
+    ctx.fillText('IR',x,y);
   }
+
+  ctx.fillStyle='#b8401c';ctx.font='600 11px Manrope';ctx.textAlign='center';
+  ctx.fillText('🔥 ~800°C',240,340);
+
+  // Panneau droit : ZOOM PHOTONS (échelle quantique)
+  ctx.fillStyle='#0a0408';
+  ctx.fillRect(595,80,360,280);
+  ctx.strokeStyle='#ff8c3f';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,280);
+  ctx.fillStyle='#ff8c3f';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 ZOOM ÉCHELLE QUANTIQUE',775,75);
+
+  // Atomes carbone (charbon de bois) qui vibrent à haute énergie
+  for(let i=0;i<8;i++){
+    const baseX=620+(i%4)*55, baseY=290+Math.floor(i/4)*30;
+    const vibe=4;
+    const dx=(Math.random()-0.5)*vibe;
+    const dy=(Math.random()-0.5)*vibe;
+    // Atomes très chauds = blancs/oranges
+    ctx.fillStyle='#ff8c3f';
+    ctx.shadowColor='#ff8c3f';ctx.shadowBlur=15;
+    ctx.beginPath();ctx.arc(baseX+dx,baseY+dy,8,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle='#fff';ctx.font='bold 8px Manrope';ctx.textAlign='center';
+    ctx.fillText('C',baseX+dx,baseY+dy+3);
+  }
+
+  // Photons IR émis (petites particules ondulantes qui montent)
+  for(let i=0;i<15;i++){
+    const t=(animTime*0.7+i*0.18)%2;
+    const startX=620+(i%5)*40;
+    const x=startX+Math.sin(t*6+i)*12;
+    const y=290-t*200;
+    const alpha=Math.max(0,1-t/2);
+    if(y<280&&y>90){
+      // Forme onde-particule (petit zigzag)
+      ctx.strokeStyle=`rgba(255,140,63,${alpha})`;
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(x-6,y);ctx.lineTo(x-3,y-3);ctx.lineTo(x,y);ctx.lineTo(x+3,y+3);ctx.lineTo(x+6,y);
+      ctx.stroke();
+      // Étiquette photon
+      if(i%5===0){
+        ctx.fillStyle=`rgba(255,200,100,${alpha*0.8})`;
+        ctx.font='bold 9px JetBrains Mono';ctx.textAlign='left';
+        ctx.fillText('γ',x+8,y+3);
+      }
+    }
+  }
+
+  // Étiquettes
+  ctx.fillStyle='#ff8c3f';ctx.font='600 11px Manrope';ctx.textAlign='center';
+  ctx.fillText('atomes très excités',775,335);
+  ctx.fillText('→ émettent des PHOTONS γ infrarouges',775,350);
+
+  // Texte explicatif
   ctx.fillStyle='#2a1810';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
-  ctx.fillText("Les braises émettent des ondes infrarouges (invisibles).",60,80);
-  ctx.fillText("La chaleur voyage SANS CONTACT, comme la lumière du soleil.",60,105);
-  ctx.fillStyle='#b8401c';ctx.font='600 13px JetBrains Mono';
-  ctx.fillText('💡 Mode = RAYONNEMENT',680,80);
+  ctx.fillText("Les braises émettent des PHOTONS infrarouges (invisibles).",60,50);
+  ctx.fillText("Ces particules de lumière voyagent SANS contact, dans l'air.",60,70);
 }
 
 function drawP3(){
-  drawEmbers(500,340,1);
-  // Pain au-dessus, distance variable selon animTime
-  const dist=70+Math.sin(animTime)*5;
-  const painY=340-dist;
+  // === VUE EN COUPE DU PAIN : molécules d'eau qui s'évaporent ===
+
+  // Panneau gauche : pain au-dessus des braises (vue d'ensemble)
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,280);
+  ctx.strokeStyle='#7a5c3a';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,280);
+  ctx.fillStyle='#7a5c3a';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE',240,75);
+
+  // Braises
+  drawEmbers(240,310,1);
   // Manche
+  const painY=200;
   ctx.strokeStyle='#3a2a22';ctx.lineWidth=4;
-  ctx.beginPath();ctx.moveTo(180,painY);ctx.lineTo(450,painY);ctx.stroke();
-  // Pain
+  ctx.beginPath();ctx.moveTo(80,painY);ctx.lineTo(290,painY);ctx.stroke();
+  // Pain sur grille
   const doneness=Math.min(0.4,animTime*0.15);
-  drawPainOnGrille(500,painY,doneness);
-  // Rayons concentrés vers le pain
+  drawPainOnGrille(330,painY,doneness);
+  // Rayons IR montants
   for(let i=-2;i<=2;i++){
-    const x=480+i*15;
+    const x=300+i*15;
     const t=(animTime*1.2+i*0.3)%1;
-    const y=340-t*dist;
+    const y=300-t*100;
     ctx.fillStyle=`rgba(232,93,42,${(1-t)*0.6})`;
     ctx.font='bold 14px serif';ctx.textAlign='center';
     ctx.fillText('▲',x,y);
   }
-  // Flèches énergie
-  ctx.strokeStyle='#e85d2a';ctx.lineWidth=2;
-  for(let i=-1;i<=1;i++){
-    const x=500+i*30;
-    ctx.setLineDash([3,3]);
-    ctx.beginPath();ctx.moveTo(x,330);ctx.lineTo(x,painY+15);ctx.stroke();
+  // Loupe qui pointe vers le pain
+  ctx.strokeStyle='#b8401c';ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.arc(330,painY,40,0,Math.PI*2);
+  ctx.stroke();
+  ctx.fillStyle='#b8401c';ctx.font='600 11px JetBrains Mono';
+  ctx.fillText('zoom →',410,painY);
+
+  // Panneau droit : COUPE DU PAIN AU MICROSCOPE
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(595,80,360,280);
+  ctx.strokeStyle='#b8401c';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,280);
+  ctx.fillStyle='#b8401c';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 COUPE DU PAIN (vue microscopique)',775,75);
+
+  // Croûte (couche supérieure plus dorée)
+  const crustGrd=ctx.createLinearGradient(0,90,0,140);
+  crustGrd.addColorStop(0,'#8a5a30');
+  crustGrd.addColorStop(1,'#c9a578');
+  ctx.fillStyle=crustGrd;
+  ctx.fillRect(610,90,330,50);
+  ctx.fillStyle='#7a4520';
+  ctx.font='600 10px Manrope';ctx.textAlign='left';
+  ctx.fillText('CROÛTE (chauffée par IR)',620,108);
+
+  // Mie (couche inférieure, plus claire)
+  ctx.fillStyle='#e8c898';
+  ctx.fillRect(610,140,330,210);
+  // Bulles (alvéoles de la mie)
+  for(let i=0;i<25;i++){
+    const bx=620+Math.random()*320;
+    const by=150+Math.random()*190;
+    const br=4+Math.random()*8;
+    ctx.fillStyle='#fdf6e7';
+    ctx.beginPath();ctx.arc(bx,by,br,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#c9a578';ctx.lineWidth=1;
+    ctx.stroke();
   }
-  ctx.setLineDash([]);
-  // Étiquettes
+  ctx.fillStyle='#7a4520';ctx.font='600 10px Manrope';
+  ctx.fillText('MIE (centre, plus tiède)',620,170);
+
+  // Photons IR qui frappent la croûte (depuis le haut)
+  for(let i=0;i<6;i++){
+    const x=640+i*50;
+    const t=(animTime*1.5+i*0.3)%1;
+    const y=80+t*15;
+    const alpha=Math.max(0,1-t);
+    ctx.strokeStyle=`rgba(255,140,63,${alpha})`;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(x,y);ctx.lineTo(x-4,y-4);
+    ctx.moveTo(x,y);ctx.lineTo(x-4,y+4);
+    ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,200,100,${alpha})`;ctx.fill();
+  }
+  // Étiquette photons
+  ctx.fillStyle='#ff8c3f';ctx.font='600 10px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('photons IR ↓',775,82);
+
+  // Molécules d'eau (H₂O) qui s'évaporent depuis la croûte
+  for(let i=0;i<8;i++){
+    const t=(animTime*0.8+i*0.25)%2.5;
+    const startX=640+i*40;
+    const x=startX+Math.sin(t*4+i)*8;
+    const y=130-t*50; // Sortent de la croûte vers le haut
+    const alpha=Math.max(0,1-t/2.5);
+    if(y>50&&y<140){
+      // 2 atomes H + 1 O = H₂O
+      ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+      ctx.beginPath();ctx.arc(x-5,y+3,3.5,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(x+5,y+3,3.5,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=`rgba(58,168,200,${alpha})`;
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();
+      // Liaisons
+      ctx.strokeStyle=`rgba(125,200,222,${alpha*0.7})`;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-5,y+3);
+      ctx.moveTo(x,y);ctx.lineTo(x+5,y+3);ctx.stroke();
+      // Étiquette H₂O
+      if(i%3===0){
+        ctx.fillStyle=`rgba(58,168,200,${alpha*0.9})`;
+        ctx.font='bold 9px JetBrains Mono';ctx.textAlign='left';
+        ctx.fillText('H₂O',x+8,y+3);
+      }
+    }
+  }
+
+  // Légende droite
+  ctx.fillStyle='#3aa8c8';ctx.font='600 11px Manrope';ctx.textAlign='right';
+  ctx.fillText('💧 H₂O qui s\u2019évapore',945,300);
+  ctx.fillStyle='#ff8c3f';
+  ctx.fillText('☀ photons absorbés',945,318);
+
+  // Texte explicatif
   ctx.fillStyle='#2a1810';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
-  ctx.fillText("Le pain reçoit l'énergie infrarouge → il chauffe.",60,80);
-  ctx.fillText("Plus c'est PRÈS, plus c'est CHAUD (×4 si distance ÷2).",60,105);
+  ctx.fillText("Les photons frappent la CROÛTE et la chauffent.",60,50);
+  ctx.fillText("L'eau s'évapore (H₂O) → la surface sèche et durcit.",60,70);
 }
 
 function drawP4(){
-  drawEmbers(500,340,0.7);
+  // === RÉACTION DE MAILLARD : vue moléculaire ===
+
+  // Panneau gauche : pain doré final
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(60,80,360,280);
+  ctx.strokeStyle='#7a5c3a';ctx.lineWidth=2;
+  ctx.strokeRect(60,80,360,280);
+  ctx.fillStyle='#7a5c3a';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('VUE EXTERNE : pain doré',240,75);
+
+  // Braises (en arrière-plan, plus faibles)
+  drawEmbers(240,330,0.6);
+
   // Pain bien doré
-  const painY=270;
+  const painY=200;
   ctx.strokeStyle='#3a2a22';ctx.lineWidth=4;
-  ctx.beginPath();ctx.moveTo(180,painY);ctx.lineTo(450,painY);ctx.stroke();
-  drawPainOnGrille(500,painY,0.7);
-  // Vapeur arôme
-  ctx.strokeStyle='rgba(212,165,72,.5)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(80,painY);ctx.lineTo(290,painY);ctx.stroke();
+  drawPainOnGrille(330,painY,0.7);
+
+  // Vapeurs aromatiques
+  ctx.strokeStyle='rgba(212,165,72,.6)';ctx.lineWidth=2;
   for(let i=0;i<3;i++){
     ctx.beginPath();
-    for(let t=0;t<1;t+=0.05){
-      const x=480+i*20+Math.sin(t*8+animTime*2+i)*8;
-      const y=painY-10-t*60;
-      if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    for(let s=0;s<1;s+=0.05){
+      const x=320+i*15+Math.sin(s*8+animTime*2+i)*7;
+      const y=painY-10-s*70;
+      if(s===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
     }
     ctx.stroke();
   }
-  // Symbole formule chimique
-  ctx.fillStyle='#b8401c';ctx.font='600 13px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('🧪 Réaction de Maillard',640,80);
-  ctx.fillText('sucres + protéines → croûte dorée',640,100);
-  ctx.fillText('+ arômes (mélanoïdines)',640,120);
-  ctx.fillStyle='#2a1810';ctx.font='italic 16px Fraunces';
-  ctx.fillText("À partir de 140°C, le pain dore et libère ses arômes.",60,80);
-  ctx.fillText("C'est la même réaction qu'une viande grillée !",60,105);
+  ctx.fillStyle='#b8401c';ctx.font='bold 22px serif';ctx.textAlign='center';
+  ctx.fillText('🍞',330,160);
+
+  // Panneau droit : RÉACTION CHIMIQUE (échelle moléculaire)
+  ctx.fillStyle='#fdf6e7';
+  ctx.fillRect(595,80,360,280);
+  ctx.strokeStyle='#b8401c';ctx.lineWidth=2;
+  ctx.strokeRect(595,80,360,280);
+  ctx.fillStyle='#b8401c';ctx.font='600 11px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('🔬 RÉACTION DE MAILLARD',775,75);
+
+  const t=Math.min(animTime/3,1);
+
+  // === MEMBRES DE GAUCHE (réactifs) ===
+  // Sucre (glucose) — molécule simple représentée
+  const reactProgress=t<0.5?t*2:1;
+  const sugarX=625-reactProgress*15;
+  // Hexagone (cycle du glucose)
+  ctx.fillStyle='#7ab548';
+  ctx.beginPath();
+  for(let i=0;i<6;i++){
+    const a=i*Math.PI/3;
+    const x=sugarX+Math.cos(a)*14;
+    const y=170+Math.sin(a)*14;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#558034';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='bold 10px Manrope';ctx.textAlign='center';
+  ctx.fillText('SUCRE',sugarX,173);
+  // Étiquette
+  ctx.fillStyle='#558034';ctx.font='600 9px Manrope';
+  ctx.fillText('(glucose)',sugarX,205);
+
+  // +
+  if(t<0.45){
+    ctx.fillStyle='#2a1810';ctx.font='bold 22px Manrope';
+    ctx.fillText('+',680,178);
+  }
+
+  // Acide aminé (protéine) — chaîne simple
+  const aminoX=720+reactProgress*15;
+  // Atomes représentant un acide aminé : N - C - C - O
+  ctx.fillStyle='#3aa8c8';
+  ctx.beginPath();ctx.arc(aminoX-15,170,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 8px Manrope';
+  ctx.fillText('N',aminoX-15,173);
+  ctx.fillStyle='#7c8aa3';
+  ctx.beginPath();ctx.arc(aminoX,170,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.fillText('C',aminoX,173);
+  ctx.fillStyle='#3aa8c8';
+  ctx.beginPath();ctx.arc(aminoX+15,170,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.fillText('O',aminoX+15,173);
+  // Liaisons
+  ctx.strokeStyle='#4a5775';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(aminoX-7,170);ctx.lineTo(aminoX-8,170);
+  ctx.moveTo(aminoX+8,170);ctx.lineTo(aminoX+7,170);
+  ctx.stroke();
+  ctx.fillStyle='#558034';ctx.font='600 9px Manrope';
+  ctx.fillText('(acide aminé)',aminoX,205);
+
+  // Indication température
+  ctx.fillStyle='#b8401c';ctx.font='600 11px JetBrains Mono';
+  ctx.fillText('≥ 140°C',680,160);
+
+  // === EXPLOSION/COLLISION (au moment de la réaction) ===
+  if(t>0.4&&t<0.7){
+    const flashIntensity=1-Math.abs(t-0.55)*4;
+    ctx.fillStyle=`rgba(212,165,72,${flashIntensity*0.6})`;
+    ctx.beginPath();ctx.arc(680,180,40,0,Math.PI*2);ctx.fill();
+    // Étoiles
+    ctx.strokeStyle=`rgba(184,64,28,${flashIntensity})`;
+    ctx.lineWidth=2;
+    for(let i=0;i<6;i++){
+      const a=i*Math.PI/3;
+      ctx.beginPath();
+      ctx.moveTo(680,180);
+      ctx.lineTo(680+Math.cos(a)*30,180+Math.sin(a)*30);
+      ctx.stroke();
+    }
+  }
+
+  // FLÈCHE
+  if(t>0.5){
+    const fade=Math.min(1,(t-0.5)*4);
+    ctx.fillStyle=`rgba(42,24,16,${fade})`;
+    ctx.font='bold 20px Manrope';ctx.textAlign='center';
+    ctx.fillText('→',775,178);
+  }
+
+  // === PRODUITS (à droite) ===
+  if(t>0.6){
+    const fade=Math.min(1,(t-0.6)*3);
+    ctx.globalAlpha=fade;
+    // Mélanoïdine — molécule complexe (gros amas brun)
+    ctx.fillStyle='#8a5a30';
+    ctx.beginPath();
+    for(let i=0;i<8;i++){
+      const a=i*Math.PI/4+t;
+      const x=850+Math.cos(a)*12;
+      const y=170+Math.sin(a)*12;
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#3a2a22';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#fdf6e7';ctx.font='bold 9px Manrope';ctx.textAlign='center';
+    ctx.fillText('Mélanoïdine',850,173);
+    ctx.fillStyle='#7a4520';ctx.font='600 9px Manrope';
+    ctx.fillText('(brun + arômes)',850,205);
+    ctx.globalAlpha=1;
+  }
+
+  // Molécules d'arômes qui s'envolent
+  if(t>0.7){
+    for(let i=0;i<5;i++){
+      const tt=((animTime-2)*0.5+i*0.3)%2;
+      const x=850+Math.sin(tt*6+i)*15;
+      const y=160-tt*70;
+      const alpha=Math.max(0,1-tt/2);
+      if(y>80){
+        ctx.fillStyle=`rgba(212,165,72,${alpha})`;
+        ctx.font='bold 14px serif';ctx.textAlign='center';
+        ctx.fillText('☁',x,y);
+      }
+    }
+  }
+
+  // === ÉQUATION ÉCRITE ===
+  ctx.fillStyle='#b8401c';ctx.font='bold 13px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('SUCRES + PROTÉINES → MÉLANOÏDINES',775,265);
+  ctx.fillStyle='#558034';ctx.font='600 11px Manrope';
+  ctx.fillText('+ 🟫 couleur brune',775,290);
+  ctx.fillText('+ ☁ molécules d\u2019arômes',775,310);
+  ctx.fillStyle='#7a4520';ctx.font='italic 10px Fraunces';
+  ctx.fillText('découverte par Louis-Camille Maillard, 1912',775,335);
+
+  // Texte explicatif
+  ctx.fillStyle='#2a1810';ctx.font='italic 16px Fraunces';ctx.textAlign='left';
+  ctx.fillText("Au-dessus de 140°C, les SUCRES et PROTÉINES réagissent.",60,50);
+  ctx.fillText("Ils forment les MÉLANOÏDINES : croûte dorée + arômes !",60,70);
 }
 
 drawAnim();
